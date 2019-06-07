@@ -1,0 +1,17 @@
+{
+  "name": "wever-server",
+  "version": "1.0.0",
+  "description": "Server for waver",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "dependencies": {
+    "body-parser": "^1.18.3",
+    "cors": "^2.8.5",
+    "dotenv": "^8.0.0",
+    "express": "^4.16.4",
+    "fluent-ffmpeg": "^2.1.2"
+  }
+}
