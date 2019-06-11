@@ -6,8 +6,8 @@ module.exports = (sequelize, DataTypes) => {
     name: DataTypes.STRING,
     surname: DataTypes.STRING,
     bio: DataTypes.TEXT,
-    email: DataTypes.TEXT,
-    phone: DataTypes.TEXT
+    email: DataTypes.STRING,
+    phone: DataTypes.STRING
   })
   User.associate = function(models) {
     User.hasMany(models.order, {
