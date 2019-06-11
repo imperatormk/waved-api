@@ -47,13 +47,13 @@ module.exports = {
           updatedAt: Sequelize.fn('NOW') // temp
         }, {
           instrument: 'guitar',
-          url: 'guitartrack',
-          songId: 1,
+          url: 'mop_guitartrack',
+          songId: 2,
           createdAt: Sequelize.fn('NOW'), // temp
           updatedAt: Sequelize.fn('NOW') // temp
         }, {
           instrument: 'drums',
-          url: 'drumtrack',
+          url: 'mop_drumtrack',
           songId: 2,
           createdAt: Sequelize.fn('NOW'), // temp
           updatedAt: Sequelize.fn('NOW') // temp
