@@ -1,6 +1,7 @@
 const express = require('express')
 const bodyParser = require('body-parser')
 const cors = require('cors')
+const db = require(__basedir + '/db/controllers')
 
 const app = express()
 
@@ -20,16 +21,12 @@ app.get('/audio', (req, res) => {
 })
 
 app.get('/api/songs/:id', (req, res) => {
-  const tracks = [{
-    id: 0,
-    instrument: 'Guitar',
-    url: 'guitartrack'
-  }, {
-    id: 1,
-    instrument: 'Drums',
-    url: 'drumtrack'
-  }]
-  res.send(tracks)
+  const songId = req.params.id
+
+  return db.songs.getSongById(songId)
+    .then((song) => {
+      return res.send(song)
+    })
 })
 
 app.post('/api/audio/:id', (req, res) => {
