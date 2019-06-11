@@ -19,6 +19,19 @@ app.get('/audio', (req, res) => {
   res.sendFile(`${__basedir}/files/${audioName}.mp3`)
 })
 
+app.get('/api/songs/:id', (req, res) => {
+  const tracks = [{
+    id: 0,
+    instrument: 'Guitar',
+    url: 'guitartrack'
+  }, {
+    id: 1,
+    instrument: 'Drums',
+    url: 'drumtrack'
+  }]
+  res.send(tracks)
+})
+
 app.post('/api/audio/:id', (req, res) => {
   const { tracks, opts } = req.body
   let ffpipe = ffmpeg()
