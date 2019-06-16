@@ -1,7 +1,8 @@
 const express = require('express')
 const bodyParser = require('body-parser')
 const cors = require('cors')
-const db = require(__basedir + '/db/controllers')
+
+const routes = require('./routes')
 
 const app = express()
 
@@ -9,25 +10,9 @@ app.use(cors())
 
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: false }))
+app.use('/', routes)
 
 const ffmpeg = require('fluent-ffmpeg')
-
-app.get('/audio', (req, res) => {
-  const pitch = req.query.pitch || null
-  const audioName = req.query.name || null
-  if (!audioName) return res.status(400).send({ msg: 'emptyName' })
-
-  res.sendFile(`${__basedir}/files/${audioName}.mp3`)
-})
-
-app.get('/api/songs/:id', (req, res) => {
-  const songId = req.params.id
-
-  return db.songs.getSongById(songId)
-    .then((song) => {
-      return res.send(song)
-    })
-})
 
 app.post('/api/audio/:id', (req, res) => {
   const { tracks, opts } = req.body
