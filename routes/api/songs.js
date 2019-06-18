@@ -9,7 +9,7 @@ var upload = multer({ dest: 'files/' })
 router.get('/', (req, res, next) => {
   const pageData = { page: 1, size: 5 }
 
-  return db.getSongs(pageData)
+  return db.songs.getSongs(pageData)
     .then((songs) => {
       return res.send(songs)
     })
