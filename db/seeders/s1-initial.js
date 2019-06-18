@@ -26,9 +26,11 @@ module.exports = {
 
       const songs = queryInterface.bulkInsert('songs', [{
         title: 'Creeping Death',
+        artist: 'Metallica',
         price: 2.99
       }, {
         title: 'Master of Puppets',
+        artist: 'Metallica',
         price: 5.49
       }], {})
   
