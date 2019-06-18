@@ -6,6 +6,16 @@ const db = require(__basedir + '/db/controllers')
 var multer  = require('multer')
 var upload = multer({ dest: 'files/' })
 
+router.get('/', (req, res, next) => {
+  const pageData = { page: 1, size: 5 }
+
+  return db.getSongs(pageData)
+    .then((songs) => {
+      return res.send(songs)
+    })
+    .catch(err => next(err))
+})
+
 router.get('/:id', (req, res) => {
   const songId = req.params.id
   const pitch = req.query.pitch || 0
@@ -26,6 +36,7 @@ router.get('/:id', (req, res) => {
         tracks: pitchedTracks
       })
     })
+    .catch(err => next(err))
 })
 
 router.get('/:id/tracks/:audioName', (req, res) => {

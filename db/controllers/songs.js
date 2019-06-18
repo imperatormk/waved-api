@@ -3,8 +3,22 @@ const exportsObj = {}
 const Song = require('../models').song
 const Track = require('../models').track
 
-exportsObj.getSongs = () => {
-	return Song.findAll()
+const getPagination = (pageData) => {
+  const limit = pageData.size || 100
+  const page = pageData.page || 1
+
+	const options = {
+    limit,
+    offset: limit * (page - 1)
+  }
+  return options
+}
+
+exportsObj.getSongs = (pageData) => {
+  const options = {
+    ...getPagination(pageData)
+  }
+	return Song.findAll(options)
 }
 
 exportsObj.getSongById = (songId) => {
