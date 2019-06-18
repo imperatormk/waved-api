@@ -18,7 +18,7 @@ router.get('/:id', (req, res) => {
       const pitchedTracks = song.tracks.map((track) => {
         return {
           ...track,
-          url: `track.url_${pitch}`
+          url: `${track.url}_${pitch}`
         }
       })
       return res.send({
