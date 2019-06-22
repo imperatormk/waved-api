@@ -1,10 +1,7 @@
 const router = require('express').Router()
 
-const fs = require('fs')
 const db = require(__basedir + '/db/controllers')
-
-var multer  = require('multer')
-var upload = multer({ dest: 'files/' })
+const uploadMiddleware = require(__basedir + '/helpers').uploadMiddleware
 
 router.get('/', (req, res, next) => {
   const pageData = { page: 1, size: 5 }
@@ -16,7 +13,7 @@ router.get('/', (req, res, next) => {
     .catch(err => next(err))
 })
 
-router.get('/:id', (req, res) => {
+router.get('/:id', (req, res, next) => {
   const songId = req.params.id
   const pitch = req.query.pitch || 0
 
@@ -26,9 +23,12 @@ router.get('/:id', (req, res) => {
       const song = result.toJSON()
 
       const pitchedTracks = song.tracks.map((track) => {
+        const explPath = track.url.split('.')
+        const implPath = `${explPath[0]}_${pitch}.${explPath[1]}`
+
         return {
           ...track,
-          url: `${track.url}_${pitch}`
+          url: implPath
         }
       })
       return res.send({
@@ -39,23 +39,37 @@ router.get('/:id', (req, res) => {
     .catch(err => next(err))
 })
 
-router.get('/:id/tracks/:audioName', (req, res) => {
-  const audioName = req.params.audioName.trim()
-  const audioPath = `${__basedir}/files/${audioName}.mp3`
+const uploadMw = uploadMiddleware('tracks').fields(
+  [{
+    name: 'track', maxCount: 1
+  }, {
+    name: 'trackData'
+  }]
+)
 
-  fs.access(audioPath, fs.F_OK, (err) => {
-    if (err) {
-      return res.status(404).send({ msg: 'invalidTrack' })
-    }
-    return res.sendFile(audioPath)
-  })
+router.post('/', (req, res) => {
+  const song = req.body
+
+  return db.songs.insertSong(song)
+    .then(result => res.status(201).json(result))
 })
 
-const uploadMw = upload.fields([{ name: 'tracks', maxCount: 10 }, { name: 'data' }])
-router.post('/', uploadMw, (req, res) => {
-  const data = JSON.parse(req.body.data)
-  const { song, tracks } = data
-  res.send({ song, tracks })
+router.post('/:id/tracks', uploadMw, (req, res, next) => {
+  const songId = req.params.id
+
+  const url = req.files['track'][0].filename
+  const data = JSON.parse(req.body.metadata)
+  const { instrument } = data
+  
+  const track = {
+    songId,
+    url,
+    instrument
+  }
+
+  return db.tracks.insertTrack(track)
+    .then(result => res.status(201).json({ id: result.id }))
+    .catch(err => next(err))
 })
 
 module.exports = router
