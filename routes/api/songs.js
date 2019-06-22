@@ -5,9 +5,9 @@ const uploadMiddleware = require(__basedir + '/helpers').uploadMiddleware
 const services = require(__basedir + '/services')
 
 router.get('/', (req, res, next) => {
-  const pageData = { page: 1, size: 5 }
+  const { page, size } = req.query
 
-  return db.songs.getSongs(pageData)
+  return db.songs.getSongs({ page, size })
     .then((songs) => {
       return res.send(songs)
     })

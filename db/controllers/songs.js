@@ -5,8 +5,8 @@ const Track = require('../models').track
 
 const getPagination = (pageData) => {
   const limit = pageData.size || 100
-  const page = pageData.page || 1
-
+	const page = pageData.page || 1
+	
 	const options = {
     limit,
     offset: limit * (page - 1)
@@ -31,7 +31,11 @@ const appendSongStatus = (songObj) => {
 
 exportsObj.getSongs = (pageData) => {
   const options = {
-    ...getPagination(pageData)
+		...getPagination(pageData),
+		include: [{
+      model: Track,
+      as: 'tracks'
+    }]
   }
 	return Song.findAll(options)
 		.then(songs => songs.map(appendSongStatus))
