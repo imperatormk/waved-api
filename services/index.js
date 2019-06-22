@@ -11,8 +11,21 @@ const changeTrackPitch = (filename, pitch) => {
   let ffpipe = ffmpeg()
   ffpipe.addInput(importPath)
 
+  let pitchVal = null
+  if (!isNaN(Number(pitch))) {
+    pitchVal = Number(pitch)
+  } else if (pitch.includes('m')) {
+    pitchVal = Number(pitch.replace('m', '')) * -1
+  }
+  if (isNaN(pitchVal)) throw { status: 400, msg: 'invalidPitch' }
+
+  const rate = 44100
+  const coef = 5.946 / 100
+  const mult = 1 + (coef*pitchVal)
+  const tempo = 1 - (coef*pitchVal)
+
   const complexFilter = []
-  complexFilter.push(`[0:a]atempo=1[final]`)
+  complexFilter.push(`[0:a]asetrate=${rate}*${mult},aresample=${rate},atempo=${tempo}[final]`)
 
   const implFilename = filename.split('.')
   const explFilename = `${implFilename[0]}_${pitch}.${implFilename[1]}`
