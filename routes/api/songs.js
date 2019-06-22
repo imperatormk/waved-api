@@ -2,6 +2,7 @@ const router = require('express').Router()
 
 const db = require(__basedir + '/db/controllers')
 const uploadMiddleware = require(__basedir + '/helpers').uploadMiddleware
+const services = require(__basedir + '/services')
 
 router.get('/', (req, res, next) => {
   const pageData = { page: 1, size: 5 }
@@ -50,7 +51,7 @@ const uploadMw = uploadMiddleware('tracks').fields(
 router.post('/', (req, res) => {
   const song = req.body
 
-  return db.songs.insertSong({ ...song, status: 'PREPARING' })
+  return db.songs.insertSong(song)
     .then(result => res.status(201).json(result))
 })
 
@@ -67,8 +68,20 @@ router.post('/:id/tracks', uploadMw, (req, res, next) => {
     instrument
   }
 
-  return db.tracks.insertTrack(track)
-    .then(result => res.status(201).json({ id: result.id }))
+  return db.tracks.insertTrack({ ...track, status: 'PREPARING' })
+    .then(result => {
+      const trackId = result.id
+
+      services.pitchifyTrack(url) // TODO: move this from here
+        .then(() => {
+          db.tracks.updateTrack({ id: trackId, status: 'READY' })
+        })
+        .catch(() => { // TODO: log this
+          db.tracks.updateTrack({ id: trackId, status: 'FAILED' })
+        })
+
+      return res.status(201).json({ id: trackId })
+    })
     .catch(err => next(err))
 })
 

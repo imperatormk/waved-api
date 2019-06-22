@@ -27,37 +27,39 @@ module.exports = {
       const songs = queryInterface.bulkInsert('songs', [{
         title: 'Creeping Death',
         artist: 'Metallica',
-        price: 2.99,
-        status: 'PREPARING'
+        price: 2.99
       }, {
         title: 'Master of Puppets',
         artist: 'Metallica',
-        price: 5.49,
-        status: 'READY'
+        price: 5.49
       }], {})
   
   	  return Promise.all([users, songs]).then(() => {
         const tracks = queryInterface.bulkInsert('tracks', [{
           instrument: 'guitar',
           url: 'creepingdeath_guitartrack',
+          status: 'PREPARING',
           songId: 1,
           createdAt: Sequelize.fn('NOW'), // temp
           updatedAt: Sequelize.fn('NOW') // temp
         }, {
           instrument: 'drums',
           url: 'creepingdeath_drumtrack',
+          status: 'PREPARING',
           songId: 1,
           createdAt: Sequelize.fn('NOW'), // temp
           updatedAt: Sequelize.fn('NOW') // temp
         }, {
           instrument: 'guitar',
           url: 'mop_guitartrack',
+          status: 'PREPARING',
           songId: 2,
           createdAt: Sequelize.fn('NOW'), // temp
           updatedAt: Sequelize.fn('NOW') // temp
         }, {
           instrument: 'drums',
           url: 'mop_drumtrack',
+          status: 'ERROR',
           songId: 2,
           createdAt: Sequelize.fn('NOW'), // temp
           updatedAt: Sequelize.fn('NOW') // temp

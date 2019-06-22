@@ -2,7 +2,8 @@
 module.exports = (sequelize, DataTypes) => {
   const Track = sequelize.define('track', {
     instrument: DataTypes.STRING,
-    url: DataTypes.STRING
+    url: DataTypes.STRING,
+    status: DataTypes.STRING
   })
   Track.associate = function(models) {
     Track.belongsTo(models.song, {

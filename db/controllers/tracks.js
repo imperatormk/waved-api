@@ -15,6 +15,13 @@ exportsObj.insertTrack = (track) => {
 		.then(track => exportsObj.getTrackById(track.id))
 }
 
+exportsObj.updateTrack = (track) => {
+	const options = {
+		where: { id: track.id }
+	}
+	return Track.update(track, options)
+}
+
 exportsObj.deleteTrack = (trackId) => {
 	const options = {
 		where: { id: trackId }
