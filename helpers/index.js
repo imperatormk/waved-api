@@ -19,7 +19,9 @@ const upload = (subFolder) => {
     },
     filename: (req, file, cb) => {
       crypto.pseudoRandomBytes(16, (err, raw) => {
-        cb(null, `${raw.toString('hex')}-${Date.now()}.${mime.getExtension(file.mimetype)}`)
+        let ext = mime.getExtension(file.mimetype)
+        if (ext === 'mpga') ext = 'mp3'
+        cb(null, `${raw.toString('hex')}-${Date.now()}.${ext}`)
       })
     }
   })
