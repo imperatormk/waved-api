@@ -1,7 +1,10 @@
-const router = require('express').Router()
+const express = require('express')
+const router = express.Router()
 
 const apiRoutes = require('./api')
 const errorHandler = require('./error-handler')
+
+const helpers = require(__basedir + '/helpers')
 
 let startDate = new Date()
 
@@ -10,6 +13,14 @@ router.get('/', (req, res) => {
     sane: true,
 	  startDate
   })
+})
+
+const staticFiles = ['tracks']
+staticFiles.forEach((staticFile) => {
+  const staticPath = helpers.getStaticFilesPath(staticFile)
+  const storagePath = helpers.getStoragePath(staticFile)
+
+  router.use(staticPath, express.static(storagePath))
 })
 
 router.use('/api', apiRoutes)
