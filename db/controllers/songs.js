@@ -14,11 +14,27 @@ const getPagination = (pageData) => {
   return options
 }
 
+const appendSongStatus = (songObj) => {
+	if (!songObj) return null
+	const song = songObj.toJSON()
+	
+	const { tracks } = song
+	const hasPreparing = tracks.find(track => track.status === 'PREPARING')
+	const hasFailed = tracks.find(track => track.status === 'FAILED')
+	const status = hasFailed ? 'FAILED' : hasPreparing ? 'PREPARING' : 'READY'
+
+	return {
+		...song,
+		status
+	}
+}
+
 exportsObj.getSongs = (pageData) => {
   const options = {
     ...getPagination(pageData)
   }
 	return Song.findAll(options)
+		.then(songs => songs.map(appendSongStatus))
 }
 
 exportsObj.getSongById = (songId) => {
@@ -30,6 +46,7 @@ exportsObj.getSongById = (songId) => {
     }]
 	}
 	return Song.findOne(options)
+		.then(appendSongStatus)
 }
 
 exportsObj.getSong = (song) => {
@@ -41,6 +58,7 @@ exportsObj.getSong = (song) => {
     }]
 	}
 	return Song.findOne(options)
+		.then(appendSongStatus)
 }
 
 exportsObj.insertSong = (song) => {

@@ -21,7 +21,7 @@ router.get('/:id', (req, res, next) => {
   return db.songs.getSongById(songId)
     .then((result) => {
       if (!result) return res.status(404).send({ msg: 'invalidSong' })
-      const song = result.toJSON()
+      const song = result
 
       const pitchedTracks = song.tracks.map((track) => {
         const explPath = track.url.split('.')
