@@ -50,7 +50,7 @@ const uploadMw = uploadMiddleware('tracks').fields(
 router.post('/', (req, res) => {
   const song = req.body
 
-  return db.songs.insertSong(song)
+  return db.songs.insertSong({ ...song, status: 'PREPARING' })
     .then(result => res.status(201).json(result))
 })
 

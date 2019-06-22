@@ -66,6 +66,10 @@ const songs = (Sequelize) => ({
     type: Sequelize.FLOAT,
     allowNull: false
   },
+  status: {
+    type: Sequelize.STRING,
+    allowNull: false
+  },
   createdAt: {
     type: Sequelize.DATE,
     defaultValue: Sequelize.NOW // bad

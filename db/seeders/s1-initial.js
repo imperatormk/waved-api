@@ -27,11 +27,13 @@ module.exports = {
       const songs = queryInterface.bulkInsert('songs', [{
         title: 'Creeping Death',
         artist: 'Metallica',
-        price: 2.99
+        price: 2.99,
+        status: 'PREPARING'
       }, {
         title: 'Master of Puppets',
         artist: 'Metallica',
-        price: 5.49
+        price: 5.49,
+        status: 'READY'
       }], {})
   
   	  return Promise.all([users, songs]).then(() => {
