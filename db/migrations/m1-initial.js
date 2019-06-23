@@ -24,18 +24,10 @@ const users = (Sequelize) => ({
     type: Sequelize.STRING,
     allowNull: false
   },
-  bio: {
-    type: Sequelize.TEXT,
-    defaultValue: ''
-  },
   email: {
     type: Sequelize.STRING,
     allowNull: false,
     unique: true
-  },
-  phone: {
-    type: Sequelize.STRING,
-    defaultValue: ''
   },
   createdAt: {
     type: Sequelize.DATE,

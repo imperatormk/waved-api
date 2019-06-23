@@ -7,9 +7,7 @@ module.exports = {
         password: '$2y$12$bJebJvoEk3YdbskBW7KuoePMgfGqQAh6TXfz1tdDamNZQLBJYxb6W',
         name: 'Martin',
         surname: 'Mrmach',
-        bio: 'Coder?',
         email: 'mr.mach@gmail.com',
-        phone: '069-320-420',
         createdAt: Sequelize.fn('NOW'), // temp
         updatedAt: Sequelize.fn('NOW') // temp
       }, {
@@ -17,9 +15,7 @@ module.exports = {
         password: '$2b$12$Q3lLMkZoMhEMg03a7deHBeksDQwB8k1rllH83zA7vyG7Ue7Y6g5ry',
         name: 'Darko',
         surname: 'Simonovski',
-        bio: 'Coder?',
         email: 'darko.simonovski@hotmail.com',
-        phone: '076-314-010',
         createdAt: Sequelize.fn('NOW'), // temp
         updatedAt: Sequelize.fn('NOW') // temp
       }], {})

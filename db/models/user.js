@@ -5,9 +5,7 @@ module.exports = (sequelize, DataTypes) => {
     password: DataTypes.STRING,
     name: DataTypes.STRING,
     surname: DataTypes.STRING,
-    bio: DataTypes.TEXT,
-    email: DataTypes.STRING,
-    phone: DataTypes.STRING
+    email: DataTypes.STRING
   })
   User.associate = function(models) {
     User.hasMany(models.order, {
