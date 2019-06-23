@@ -13,7 +13,7 @@ const loginFn = (req, res, next) => {
       return db.users.getUser({ id: user.id })
         .then((user) => {
           const token = jwt.sign({ username: user.username }, jwtSecret.secret)
-          return res.send({ token })
+          return res.send({ token, user })
         })
     })
   })(req, res, next)
