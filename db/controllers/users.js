@@ -1,6 +1,7 @@
 const exportsObj = {}
 
 const User = require('../models').user
+const Admin = require('../models').admin
 
 const addExcludes = (options = {}, excludes = ['password']) => {
 	if (!options.attributes) options.attributes = {}
@@ -30,6 +31,12 @@ exportsObj.getUser = (user, includePassword = false) => {
 	const extraExcludes = includePassword ? [] : ['password']
 	return addExcludes(options, extraExcludes)
 		.then(options => User.findOne(options))
+}
+
+exportsObj.isAdmin = (usrId) => { // less is more
+	const options = { where: { usrId } }
+	return Admin.findOne(options)
+		.then(admin => !!admin)
 }
 
 exportsObj.insertUser = (user) => {

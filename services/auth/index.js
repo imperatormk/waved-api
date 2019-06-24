@@ -1,6 +1,7 @@
 const exportsObj = {}
 
 exportsObj.login = require('./login')
-exportsObj.middleware = require('./middleware')
+exportsObj.authMiddleware = require('./authMiddleware')
+exportsObj.adminMiddleware = require('./adminMiddleware')
 
 module.exports = exportsObj

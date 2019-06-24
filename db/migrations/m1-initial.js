@@ -60,6 +60,33 @@ const songs = (Sequelize) => ({
   }
 })
 
+const admins = (Sequelize) => ({
+  id: {
+    allowNull: false,
+    autoIncrement: true,
+    primaryKey: true,
+    type: Sequelize.INTEGER
+  },
+  usrId: {
+    type: Sequelize.INTEGER,
+    onDelete: 'CASCADE',
+    references: {
+      model: 'users',
+      key: 'id',
+      as: 'usrId'
+    },
+    allowNull: false
+  },
+  createdAt: {
+    type: Sequelize.DATE,
+    defaultValue: Sequelize.NOW // bad
+  },
+  updatedAt: {
+    type: Sequelize.DATE,
+    defaultValue: Sequelize.NOW // bad
+  }
+})
+
 const tracks = (Sequelize) => ({
   id: {
     allowNull: false,
@@ -186,9 +213,10 @@ module.exports = {
       const songsP = queryInterface.createTable('songs', songs(Sequelize))
       return Promise.all([usersP, songsP])
         .then(() => {
+          const adminsP = queryInterface.createTable('admins', admins(Sequelize))
           const tracksP = queryInterface.createTable('tracks', tracks(Sequelize))
           const ordersP = queryInterface.createTable('orders', orders(Sequelize))
-          return Promise.all([tracksP, ordersP])
+          return Promise.all([adminsP, tracksP, ordersP])
             .then(() => {
               const processingsP = queryInterface.createTable('processings', processings(Sequelize))
               return Promise.all([processingsP])
@@ -201,9 +229,10 @@ module.exports = {
       const processingsP = queryInterface.dropTable('processings')
       return Promise.all([processingsP])
         .then(() => {
+          const adminsP = queryInterface.dropTable('admins')
           const tracksP = queryInterface.dropTable('tracks')
           const ordersP = queryInterface.dropTable('orders')
-          return Promise.all([tracksP, ordersP])
+          return Promise.all([adminsP, tracksP, ordersP])
             .then(() => {
               const usersP = queryInterface.dropTable('users')
               const songsP = queryInterface.dropTable('songs')

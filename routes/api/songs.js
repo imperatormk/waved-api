@@ -1,8 +1,11 @@
 const router = require('express').Router()
 
 const db = require(__basedir + '/db/controllers')
+
 const uploadMiddleware = require(__basedir + '/helpers').uploadMiddleware
-const authMiddleware = require(__basedir + '/services/auth').middleware
+const authMiddleware = require(__basedir + '/services/auth').authMiddleware
+const adminMiddleware = require(__basedir + '/services/auth').adminMiddleware
+
 const services = require(__basedir + '/services')
 
 router.get('/', (req, res, next) => {
@@ -49,7 +52,7 @@ const uploadMw = uploadMiddleware('tracks').fields(
   }]
 )
 
-router.post('/', (req, res) => {
+router.post('/', authMiddleware, adminMiddleware, (req, res) => {
   const song = req.body
 
   return db.songs.insertSong(song)

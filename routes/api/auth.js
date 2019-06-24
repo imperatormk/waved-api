@@ -1,6 +1,6 @@
 const router = require('express').Router()
 
-const authMiddleware = require(__basedir + '/services/auth').middleware
+const authMiddleware = require(__basedir + '/services/auth').authMiddleware
 const login = require(__basedir + '/services/auth').login
 
 router.get('/user', authMiddleware, (req, res) => {

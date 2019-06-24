@@ -10,10 +10,17 @@ const loginFn = (req, res, next) => {
     if (info) return next(info)
     return req.logIn(user, (err) => {
       if (err) return next(err)
-      return db.users.getUser({ id: user.id })
-        .then((user) => {
+
+      const userId = user.id
+      const getUserFn = db.users.getUser({ id: userId })
+      const isAdminFn = db.users.isAdmin(userId)
+
+      return Promise.all([getUserFn, isAdminFn])
+        .then(([user, isAdmin]) => {
+          const userObj = user.toJSON()
           const token = jwt.sign({ username: user.username }, jwtSecret.secret)
-          return res.send({ token, user })
+
+          return res.send({ token, user: { ...userObj, isAdmin } })
         })
     })
   })(req, res, next)
