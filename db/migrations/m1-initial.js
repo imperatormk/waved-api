@@ -163,7 +163,15 @@ const processings = (Sequelize) => ({
       key: 'id',
       as: 'orderId'
     },
-    allowNull: false
+    allowNull: true
+  },
+  createdAt: {
+    type: Sequelize.DATE,
+    defaultValue: Sequelize.NOW // bad
+  },
+  updatedAt: {
+    type: Sequelize.DATE,
+    defaultValue: Sequelize.NOW // bad
   }
 })
 

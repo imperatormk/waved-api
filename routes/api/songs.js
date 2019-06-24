@@ -2,6 +2,7 @@ const router = require('express').Router()
 
 const db = require(__basedir + '/db/controllers')
 const uploadMiddleware = require(__basedir + '/helpers').uploadMiddleware
+const authMiddleware = require(__basedir + '/services/auth').middleware
 const services = require(__basedir + '/services')
 
 router.get('/', (req, res, next) => {
@@ -81,6 +82,26 @@ router.post('/:id/tracks', uploadMw, (req, res, next) => {
         })
 
       return res.status(201).json({ id: trackId })
+    })
+    .catch(err => next(err))
+})
+
+router.post('/:id/prepare', authMiddleware, (req, res, next) => {
+  const userId = req.user.id
+  const songId = req.params.id
+  const config = req.body
+
+  return db.songs.getSongById(songId)
+    .then((song) => {
+      if (!song) throw { status: 404, msg: 'songNotFound' }
+      const processing = {
+        config: JSON.stringify(config),
+        status: 'PENDING',
+        songId,
+        usrId: userId
+      }
+      return db.processings.insertProcessing(processing)
+        .then((result) => res.json({ id: result.id }))
     })
     .catch(err => next(err))
 })
