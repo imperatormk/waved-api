@@ -39,6 +39,13 @@ exportsObj.getSongs = (pageData) => {
   }
 	return Song.findAll(options)
 		.then(songs => songs.map(appendSongStatus))
+		.then((songs) => {
+			return Song.count()
+				.then(count => ({
+					totalElements: count,
+					content: songs
+				}))
+		})
 }
 
 exportsObj.getSongById = (songId) => {
