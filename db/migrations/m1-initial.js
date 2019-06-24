@@ -110,6 +110,31 @@ const orders = (Sequelize) => ({
     type: Sequelize.STRING,
     allowNull: false
   },
+  createdAt: {
+    type: Sequelize.DATE,
+    defaultValue: Sequelize.NOW // bad
+  },
+  updatedAt: {
+    type: Sequelize.DATE,
+    defaultValue: Sequelize.NOW // bad
+  }
+})
+
+const processings = (Sequelize) => ({
+  id: {
+    allowNull: false,
+    autoIncrement: true,
+    primaryKey: true,
+    type: Sequelize.INTEGER
+  },
+  config: {
+    type: Sequelize.JSON,
+    allowNull: false
+  },
+  status: {
+    type: Sequelize.STRING,
+    allowNull: false
+  },
   usrId: {
     type: Sequelize.INTEGER,
     onDelete: 'CASCADE',
@@ -130,13 +155,15 @@ const orders = (Sequelize) => ({
     },
     allowNull: false
   },
-  createdAt: {
-    type: Sequelize.DATE,
-    defaultValue: Sequelize.NOW // bad
-  },
-  updatedAt: {
-    type: Sequelize.DATE,
-    defaultValue: Sequelize.NOW // bad
+  orderId: {
+    type: Sequelize.INTEGER,
+    onDelete: 'CASCADE',
+    references: {
+      model: 'orders',
+      key: 'id',
+      as: 'orderId'
+    },
+    allowNull: false
   }
 })
 
@@ -150,18 +177,26 @@ module.exports = {
           const tracksP = queryInterface.createTable('tracks', tracks(Sequelize))
           const ordersP = queryInterface.createTable('orders', orders(Sequelize))
           return Promise.all([tracksP, ordersP])
+            .then(() => {
+              const processingsP = queryInterface.createTable('processings', processings(Sequelize))
+              return Promise.all([processingsP])
+            })
         })
     })
   },
   down: (queryInterface, Sequelize) => {
     return queryInterface.sequelize.transaction((t) => {
-      const tracksP = queryInterface.dropTable('tracks')
-      const ordersP = queryInterface.dropTable('orders')
-      return Promise.all([tracksP, ordersP])
+      const processingsP = queryInterface.dropTable('processings')
+      return Promise.all([processingsP])
         .then(() => {
-          const usersP = queryInterface.dropTable('users')
-          const songsP = queryInterface.dropTable('songs')
-          return Promise.all([usersP, songsP])
+          const tracksP = queryInterface.dropTable('tracks')
+          const ordersP = queryInterface.dropTable('orders')
+          return Promise.all([tracksP, ordersP])
+            .then(() => {
+              const usersP = queryInterface.dropTable('users')
+              const songsP = queryInterface.dropTable('songs')
+              return Promise.all([usersP, songsP])
+            })
         })
     })
   }
