@@ -135,6 +135,10 @@ const processings = (Sequelize) => ({
     type: Sequelize.STRING,
     allowNull: false
   },
+  outputFilename: {
+    type: Sequelize.STRING,
+    allowNull: true
+  },
   usrId: {
     type: Sequelize.INTEGER,
     onDelete: 'CASCADE',

@@ -4,7 +4,7 @@ const helpers = require(__basedir + '/helpers')
 
 const exportsObj = {}
 
-const changeTrackPitch = (filename, pitch) => {
+const changeTrackPitch = (filename, pitch) => { // TODO: move this to processing service
   const directory = helpers.getStoragePath('tracks')
   const importPath = path.join(directory, filename)
 
