@@ -6,9 +6,9 @@ const authMiddleware = require(__basedir + '/services/auth').middleware
 const services = require(__basedir + '/services')
 
 router.get('/', (req, res, next) => {
-  const { page, size } = req.query
+  const { page, size, by, order } = req.query
 
-  return db.songs.getSongs({ page, size })
+  return db.songs.getSongs({ page, size, by, order })
     .then((songs) => {
       return res.send(songs)
     })
