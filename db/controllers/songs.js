@@ -23,7 +23,7 @@ const appendSongStatus = (songObj) => {
 	
 	const { tracks } = song
 	const hasPreparing = tracks.find(track => track.status === 'PREPARING')
-	const hasFailed = tracks.find(track => track.status === 'FAILED')
+	const hasFailed = tracks.find(track => track.status === 'FAILED') || tracks.length === 0
 	const status = hasFailed ? 'FAILED' : hasPreparing ? 'PREPARING' : 'READY'
 
 	return {
@@ -44,7 +44,7 @@ exportsObj.getSongs = (pageData) => {
 		.then(songs => songs.map(appendSongStatus))
 		.then((songs) => {
 			return Song.count()
-				.then(count => ({
+				.then((count) => ({
 					totalElements: count,
 					content: songs
 				}))
