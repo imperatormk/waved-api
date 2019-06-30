@@ -2,8 +2,9 @@ const exportsObj = {}
 
 const Processing = require('../models').processing
 const Order = require('../models').order
+const Song = require('../models').song
 
-const getPagination = (pageData) => {
+const getPagination = (pageData = {}) => {
   const limit = pageData.size || 100
 	const page = pageData.page || 1
 	
@@ -20,10 +21,21 @@ exportsObj.getProcessings = (pageData, userId) => {
 		include: [{
       model: Order,
       as: 'order'
+    }, {
+      model: Song,
+      as: 'song'
     }]
   }
   if (userId) options.where = { usrId: userId }
-	return Processing.findAll(options)
+  
+  return Processing.findAll(options)
+		.then((processings) => {
+			return Processing.count({ where: options.where || {} })
+				.then((count) => ({
+					totalElements: count,
+					content: processings
+				}))
+		})
 }
 
 exportsObj.getProcessingById = (pcsId) => {

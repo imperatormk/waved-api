@@ -60,22 +60,27 @@ exportsObj.performProcessing = (pcsId) => { // this is more of a controller inst
     .then((processing) => {
       if (!processing) throw { status: 404, msg: 'processingNotFound' }
       // if (!processing.orderId) throw { status: 402, msg: 'notYetOrdered' }
-      if (processing.status !== 'PENDING') throw { status: 410, msg: 'notProcessable' }
+
+      const forbiddenStatuses = ['PREPARING', 'READY']
+      if (forbiddenStatuses.includes(processing.status))
+        throw { status: 410, msg: 'notProcessable' }
       return processing.toJSON()
     })
     .then((processing) => {
-      const preparingProcessing = { id: processing.id, status: 'PREPARING' }
+      const id = processing.id
+      const preparingProcessing = { id, status: 'PREPARING' }
+
       return db.processings.updateProcessing(preparingProcessing)
         .then(() => {
           const config = JSON.parse(processing.config)
           return performProcessing(pcsId, config)
             .then((result) => {
-              const readyProcessing = { id: processing.id, status: 'READY', outputFilename: result.filename }
+              const readyProcessing = { id, status: 'READY', outputFilename: result.filename }
               return db.processings.updateProcessing(readyProcessing)
                 .then(() => result)
             })
             .catch((err) => {
-              const failedProcessing = { id: processing.id, status: 'FAILED' }
+              const failedProcessing = { id, status: 'FAILED' }
               return db.processings.updateProcessing(failedProcessing)
                 .then(() => Promise.reject(err))
             })

@@ -12,9 +12,7 @@ router.get('/', (req, res, next) => {
   const { page, size, by, order } = req.query
 
   return db.songs.getSongs({ page, size, by, order })
-    .then((songs) => {
-      return res.send(songs)
-    })
+    .then(songs => res.send(songs))
     .catch(err => next(err))
 })
 
