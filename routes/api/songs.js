@@ -71,18 +71,24 @@ router.post('/:id/tracks', uploadMw, (req, res, next) => {
   }
 
   return db.tracks.insertTrack({ ...track, status: 'PREPARING' })
-    .then(result => {
-      const trackId = result.id
+    .then((result) => {
+      const { id, songId } = result
 
       services.pitchifyTrack(url) // TODO: move this from here
-        .then(() => {
-          db.tracks.updateTrack({ id: trackId, status: 'READY' })
+        .then(({ results }) => {
+          db.tracks.updateTrack({ id, status: 'READY' })
+
+          const { duration } = results[0] // ym okay
+          db.songs.updateSong({
+            id: songId,
+            duration
+          })
         })
         .catch(() => { // TODO: log this
-          db.tracks.updateTrack({ id: trackId, status: 'FAILED' })
+          db.tracks.updateTrack({ id, status: 'FAILED' })
         })
 
-      return res.status(201).json({ id: trackId })
+      return res.status(201).json({ id })
     })
     .catch(err => next(err))
 })

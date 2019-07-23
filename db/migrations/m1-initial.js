@@ -50,6 +50,10 @@ const songs = (Sequelize) => ({
     type: Sequelize.FLOAT,
     allowNull: false
   },
+  duration: {
+    type: Sequelize.INTEGER,
+    defaultValue: 0
+  },
   createdAt: {
     type: Sequelize.DATE,
     defaultValue: Sequelize.NOW // bad
