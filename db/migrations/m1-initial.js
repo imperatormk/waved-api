@@ -46,6 +46,10 @@ const songs = (Sequelize) => ({
     type: Sequelize.STRING,
     allowNull: false
   },
+  genre: {
+    type: Sequelize.STRING,
+    allowNull: false
+  },
   price: {
     type: Sequelize.FLOAT,
     allowNull: false
