@@ -3,7 +3,7 @@ const exportsObj = {}
 const Song = require('../models').song
 const Track = require('../models').track
 
-const getPagination = (pageData) => {
+const getPagination = (pageData = {}) => {
   const limit = pageData.size || 100
 	const page = pageData.page || 1
 	const by = pageData.by || 'id'
@@ -32,16 +32,32 @@ const appendSongStatus = (songObj) => {
 	}
 }
 
-exportsObj.getSongs = (pageData) => {
+exportsObj.getSongs = (pageData, criteria = {}) => {
+	// flimsy
+	const includeObj = {
+		model: Track,
+		as: 'tracks'
+	}
+
+	const { instrument } = criteria
+	if (instrument) {
+		delete criteria.instrument
+		includeObj.where = {
+			instrument: instrument
+		}
+	}
+
   const options = {
+		where: criteria,
+		include: [includeObj],
 		...getPagination(pageData),
-		include: [{
-      model: Track,
-      as: 'tracks'
-    }]
   }
 	return Song.findAll(options)
 		.then(songs => songs.map(appendSongStatus))
+		.then((songs) => songs.map((song) => {
+			delete song.tracks
+			return song
+		}))
 		.then((songs) => {
 			return Song.count({ where: options.where || {} })
 				.then((count) => ({
@@ -49,18 +65,6 @@ exportsObj.getSongs = (pageData) => {
 					content: songs
 				}))
 		})
-}
-
-exportsObj.getSongById = (songId) => {
-	const options = {
-		where: { id: songId },
-    include: [{
-      model: Track,
-      as: 'tracks'
-    }]
-	}
-	return Song.findOne(options)
-		.then(appendSongStatus)
 }
 
 exportsObj.getSong = (song) => {
@@ -73,6 +77,11 @@ exportsObj.getSong = (song) => {
 	}
 	return Song.findOne(options)
 		.then(appendSongStatus)
+}
+
+exportsObj.getSongById = (songId) => {
+	const criteria = { id: songId }
+	return exportsObj.getSong(criteria)
 }
 
 exportsObj.insertSong = (song) => {

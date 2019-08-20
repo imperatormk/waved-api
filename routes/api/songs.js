@@ -10,8 +10,13 @@ const services = require(__basedir + '/services')
 
 router.get('/', (req, res, next) => {
   const { page, size, by, order } = req.query
+  const { genre, instrument } = req.query
 
-  return db.songs.getSongs({ page, size, by, order })
+  const criteria = {}
+  if (genre) criteria.genre = genre
+  if (instrument) criteria.instrument = instrument
+
+  return db.songs.getSongs({ page, size, by, order }, criteria)
     .then(songs => res.send(songs))
     .catch(err => next(err))
 })
