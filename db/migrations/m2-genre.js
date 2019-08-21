@@ -8,7 +8,8 @@ module.exports = {
         'genre',
         {
           type: Sequelize.STRING,
-          allowNull: false
+          allowNull: false,
+          defaultValue: 'rock'
         }
       )
     ])
