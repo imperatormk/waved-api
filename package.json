@@ -8,6 +8,7 @@
   },
   "author": "",
   "dependencies": {
+    "@mollie/api-client": "^2.3.2",
     "bcrypt": "^3.0.6",
     "body-parser": "^1.18.3",
     "cors": "^2.8.5",
