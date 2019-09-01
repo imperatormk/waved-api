@@ -4,6 +4,34 @@ const ffmpeg = require('fluent-ffmpeg')
 const path = require('path')
 const db = require(__basedir + '/db/controllers')
 const helpers = require(__basedir + '/helpers')
+const paymentsService = require(__basedir + '/services/payments')
+
+exportsObj.orderProcessing = async (processing) => {
+  try {
+    if (processing.order) {
+      const payment = await paymentsService.getPayment(processing.order.txnId)
+      if (payment.isPaid()) throw { status: 409, msg: 'alreadyOrdered' }
+
+      const paymentUrl = payment.getPaymentUrl()
+      return { paymentUrl }
+    }
+
+    const { id, status, paymentUrl } = await paymentsService.createPayment(processing)
+    const order = {
+      txnId: id,
+      status
+    }
+    const orderResult = await db.orders.insertOrder(order)
+    await db.processings.updateProcessing({
+      id: processing.id,
+      orderId: orderResult.id
+    })
+
+    return { paymentUrl }
+  } catch(e) {
+    return Promise.reject(e)
+  }
+}
 
 const performProcessing = (id, config) => {
   const { tracks, opts } = config
@@ -59,7 +87,7 @@ exportsObj.performProcessing = (pcsId) => { // this is more of a controller inst
   return db.processings.getProcessingById(pcsId)
     .then((processing) => {
       if (!processing) throw { status: 404, msg: 'processingNotFound' }
-      // if (!processing.orderId) throw { status: 402, msg: 'notYetOrdered' }
+      // if (!processing.orderId) throw { status: 402, msg: 'notYetOrdered' } // this is a wrong check now
 
       const forbiddenStatuses = ['PREPARING', 'READY']
       if (forbiddenStatuses.includes(processing.status))
@@ -67,7 +95,7 @@ exportsObj.performProcessing = (pcsId) => { // this is more of a controller inst
       return processing.toJSON()
     })
     .then((processing) => {
-      const id = processing.id
+      const { id } = processing
       const preparingProcessing = { id, status: 'PREPARING' }
 
       return db.processings.updateProcessing(preparingProcessing)

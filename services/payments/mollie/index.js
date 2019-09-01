@@ -1,7 +1,8 @@
 const db = require(__basedir + '/db/controllers')
 const mollieLib = require('@mollie/api-client')
+const publicIp = require('public-ip')
 
-const { MOLLIE_API_KEY, MODE } = process.env
+const { MOLLIE_API_KEY, MODE, PORT, FPORT } = process.env
 const mollie = mollieLib({ apiKey: MOLLIE_API_KEY })
 
 const currency = 'EUR' // TODO: unhardcode this?
@@ -19,11 +20,14 @@ const createPayment = async (processing) => {
       description: `Payment for ${song.title}`
     }
 
-    // TODO: fix this
-    if (MODE === 'prod') {
-      paymentObj.redirectUrl = 'doItHere'
-      paymentObj.webhookUrl = 'doItHere'
+    const ip = await publicIp.v4()
+
+    if (MODE === 'dev') {
+      // TODO: do magic for dev public ip here?
     }
+
+    paymentObj.redirectUrl = `http://${ip}:${FPORT}/thankyou`
+    paymentObj.webhookUrl = `http://${ip}:${PORT}/api/processings/${processing.id}/perform`
 
     const payment = await mollie.payments.create(paymentObj)
     const { id, status } =  payment
