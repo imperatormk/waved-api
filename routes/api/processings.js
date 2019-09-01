@@ -82,7 +82,7 @@ router.get('/:id/download/', authMiddleware, (req, res, next) => {
       if (result.usrId !== req.user.id) throw { status: 400, msg: 'badProcessing' }
 
       const { outputFilename } = result
-      if (!outputFilename) throw { status: 404, msg: 'notReady' }
+      if (!outputFilename) throw { status: 412, msg: 'notReady' }
       return outputFilename
     })
     .then((outputFilename) => {
@@ -94,6 +94,7 @@ router.get('/:id/download/', authMiddleware, (req, res, next) => {
         res.set('Content-Disposition', `attachment;filename=${outputFilename}`)
         res.set('Content-Type', 'application/octet-stream')
         res.download(outputPath)
+        return
       }
       throw { status: 404, msg: 'notFound' }
     })
