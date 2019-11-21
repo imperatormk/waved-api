@@ -2,6 +2,10 @@ const exportsObj = {}
 
 const Genre = require('../models').genre
 
+exportsObj.getGenres = () => {
+	return Genre.findAll()
+}
+
 exportsObj.getGenreById = (genreId) => {
 	const options = {
 		where: { id: genreId }

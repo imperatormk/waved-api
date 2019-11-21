@@ -4,7 +4,7 @@ const fs = require('fs')
 
 const db = require(__basedir + '/db/controllers')
 const helpers = require(__basedir + '/helpers')
-const authMiddleware = require(__basedir + '/services/auth').authMiddleware
+const { authMiddleware } = require(__basedir + '/services/auth')
 const processingService = require(__basedir + '/services/processing')
 const paymentsService = require(__basedir + '/services/payments') // TODO: maybe move sometimes
 

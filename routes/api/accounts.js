@@ -1,12 +1,12 @@
 const router = require('express').Router()
 
 const db = require(__basedir + '/db/controllers')
-const registerService = require(__basedir + '/services/accounts').register
-const authMiddleware = require(__basedir + '/services/auth').authMiddleware
+const { register } = require(__basedir + '/services/accounts')
+const { authMiddleware } = require(__basedir + '/services/auth')
 
 router.post('/register', (req, res, next) => {
   const user = req.body
-  return registerService(user)
+  return register(user)
     .then(user => res.send(user))
     .catch(err => next(err))
 })

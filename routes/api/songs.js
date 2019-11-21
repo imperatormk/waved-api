@@ -2,9 +2,8 @@ const router = require('express').Router()
 
 const db = require(__basedir + '/db/controllers')
 
-const uploadMiddleware = require(__basedir + '/helpers').uploadMiddleware
-const authMiddleware = require(__basedir + '/services/auth').authMiddleware
-const adminMiddleware = require(__basedir + '/services/auth').adminMiddleware
+const { uploadMiddleware } = require(__basedir + '/helpers')
+const { adminMiddleware, authMiddleware } = require(__basedir + '/services/auth')
 
 const services = require(__basedir + '/services')
 
