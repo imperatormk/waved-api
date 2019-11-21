@@ -26,6 +26,7 @@
     "pg": "^7.10.0",
     "pg-hstore": "^2.3.2",
     "public-ip": "^3.2.0",
+    "replace-string": "^3.0.0",
     "sequelize": "^5.8.5"
   }
 }

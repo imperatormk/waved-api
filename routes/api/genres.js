@@ -4,6 +4,8 @@ const db = require(__basedir + '/db/controllers')
 
 const { adminMiddleware, authMiddleware } = require(__basedir + '/services/auth')
 
+const replaceString = require('replace-string')
+
 router.get('/', (req, res, next) => {
   return db.genres.getGenres()
     .then(genres => res.json(genres))
@@ -21,10 +23,13 @@ router.get('/:tag', (req, res, next) => {
 
 router.post('/', authMiddleware, adminMiddleware, (req, res, next) => {
   const generateTag = (genreName) => { // TODO: move to helpers?
-    const tag = (genreName || '')
-      .replace('-', ' ')
-      .replace(`'`, ' ')
-      .replace(`/`, ' ')
+    const chars = ['-', `'`, '/']
+    let escapedString = genreName
+    chars.forEach((char) => {
+      escapedString = replaceString((escapedString), char, ' ')
+    })
+  
+    const tag = escapedString
       .replace(/  +/g, '-')
       .toLowerCase()
     return tag
