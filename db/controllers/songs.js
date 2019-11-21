@@ -1,7 +1,10 @@
 const exportsObj = {}
 
 const Song = require('../models').song
+const Genre = require('../models').genre
 const Track = require('../models').track
+const GenresSongs = require('../models').genresSongs
+const sequelize = require('../models').sequelize
 
 const getPagination = (pageData = {}) => {
   const limit = pageData.size || 100
@@ -34,22 +37,36 @@ const appendSongStatus = (songObj) => {
 
 exportsObj.getSongs = (pageData, criteria = {}) => {
 	// flimsy
-	const includeObj = {
+	const trackInclude = {
 		model: Track,
 		as: 'tracks'
-	}
+  }
+  const genreInclude = {
+    model: Genre,
+    as: 'genres',
+    through: { attributes: [] }
+  }
 
-	const { instrument } = criteria
+  const { instrument, genres } = criteria
+
 	if (instrument) {
 		delete criteria.instrument
-		includeObj.where = {
-			instrument: instrument
+		trackInclude.where = {
+			instrument
 		}
-	}
+  }
 
+  if (genres) {
+		delete criteria.genres
+		genreInclude.where = genres
+  }
+  
   const options = {
 		where: criteria,
-		include: [includeObj],
+		include: [
+      trackInclude,
+      genreInclude
+    ],
 		...getPagination(pageData),
   }
 	return Song.findAll(options)
@@ -59,7 +76,10 @@ exportsObj.getSongs = (pageData, criteria = {}) => {
 			return song
 		}))
 		.then((songs) => {
-			return Song.count({ where: options.where || {} })
+			return Song.count({
+        where: options.where || {},
+        include: options.include || []
+      })
 				.then((count) => ({
 					totalElements: count,
 					content: songs
@@ -68,13 +88,23 @@ exportsObj.getSongs = (pageData, criteria = {}) => {
 }
 
 exportsObj.getSong = (song) => {
+  const trackInclude = {
+    model: Track,
+    as: 'tracks'
+  }
+  const genreInclude = {
+    model: Genre,
+    as: 'genres',
+    through: { attributes: [] }
+  }
+
 	const options = {
 		where: song,
-    include: [{
-      model: Track,
-      as: 'tracks'
-    }]
-	}
+    include: [
+      trackInclude,
+      genreInclude
+    ]
+  }
 	return Song.findOne(options)
 		.then(appendSongStatus)
 }
@@ -84,10 +114,55 @@ exportsObj.getSongById = (songId) => {
 	return exportsObj.getSong(criteria)
 }
 
-exportsObj.insertSong = (song) => {
-	return Song
-		.create(song)
-		.then(song => exportsObj.getSongById(song.id))
+exportsObj.getSongsByGenre = (genreTag) => {
+	const criteria = { tag: genreTag }
+	return exportsObj.getSongs(criteria)
+}
+
+exportsObj.insertSong = async (song) => {
+	const { genres } = song
+	if (!genres || !genres.length)
+    return Promise.reject({ msg: 'genresEmpty' })
+
+  const genresP = genres.map(async (genreId) => {
+    const genre = await Genre.findOne({ where: { id: genreId } })
+    if (genre) {
+      const genreObj = genre.toJSON()
+      return genreObj.id
+    }
+    return { invalidGenre: genreId }
+  })
+  const genresArr = await Promise.all(genresP)
+  
+  const invalidGenres = genresArr.filter(item => !!item.invalidGenre)
+  if (invalidGenres.length) {
+    const invalidGenreIds = invalidGenres.map(item => item.invalidGenre)
+    return Promise.reject({ msg: 'invalidGenres', details: [invalidGenreIds] })
+  }
+
+  const transactionP = sequelize.transaction((t) => {
+    return Song
+      .create(song, { transaction: t })
+      .then((insSong) => {
+        const { id } = insSong
+        const genresSongs =
+          genresArr.map((genreId) => ({
+            songId: id,
+            genreId: genreId
+          }))
+        return {
+          songId: id,
+          genresSongs
+        }
+      })
+      .then(({ songId, genresSongs }) => {
+        return GenresSongs.bulkCreate(genresSongs, { transaction: t })
+          .then(() => songId)
+      })
+  })
+
+  return transactionP
+    .then(songId => exportsObj.getSongById(songId))
 }
 
 exportsObj.updateSong = (song) => {

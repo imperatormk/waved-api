@@ -10,10 +10,10 @@ const services = require(__basedir + '/services')
 
 router.get('/', (req, res, next) => {
   const { page, size, by, order } = req.query
-  const { genre, instrument } = req.query
+  const { genres, instrument } = req.query
 
   const criteria = {}
-  if (genre) criteria.genre = genre
+  if (genres) criteria.genres = { tag: genres.split(',') }
   if (instrument) criteria.instrument = instrument
 
   return db.songs.getSongs({ page, size, by, order }, criteria)
@@ -55,11 +55,12 @@ const uploadMw = uploadMiddleware('tracks').fields(
   }]
 )
 
-router.post('/', authMiddleware, adminMiddleware, (req, res) => {
+router.post('/', authMiddleware, adminMiddleware, (req, res, next) => {
   const song = req.body
 
   return db.songs.insertSong(song)
     .then(result => res.status(201).json(result))
+    .catch(err => next(err))
 })
 
 router.post('/:id/tracks', uploadMw, (req, res, next) => {

@@ -3,7 +3,6 @@ module.exports = (sequelize, DataTypes) => {
   const Song = sequelize.define('song', {
     title: DataTypes.STRING,
     artist: DataTypes.STRING,
-    genre: DataTypes.STRING,
     price: DataTypes.FLOAT,
     duration: DataTypes.INTEGER,
   })
@@ -11,6 +10,10 @@ module.exports = (sequelize, DataTypes) => {
     Song.hasMany(models.track, {
       foreignKey: 'songId',
       as: 'tracks'
+    })
+    Song.belongsToMany(models.genre, {
+      through: 'genresSongs',
+      as: 'genres'
     })
   }
   return Song
