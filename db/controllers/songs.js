@@ -114,9 +114,9 @@ exportsObj.getSongById = (songId) => {
 	return exportsObj.getSong(criteria)
 }
 
-exportsObj.getSongsByGenre = (genreTag) => {
-	const criteria = { tag: genreTag }
-	return exportsObj.getSongs(criteria)
+exportsObj.getSongsByGenre = (pageData, genreTags) => {
+	const criteria = { genres: { tag: genreTags } }
+	return exportsObj.getSongs(pageData, criteria)
 }
 
 exportsObj.insertSong = async (song) => {

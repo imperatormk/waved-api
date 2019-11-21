@@ -12,9 +12,9 @@ router.get('/', (req, res, next) => {
 
 router.get('/:tag', (req, res, next) => {
   const genreTag = req.params.tag
-  const genreCriteria = { tag: [genreTag] }
+  const genreCriteria = [genreTag]
 
-  return db.songs.getSongsByGenre(genreCriteria)
+  return db.songs.getSongsByGenre(undefined, genreCriteria)
     .then(result => res.json(result))
     .catch(err => next(err))
 })
@@ -23,6 +23,8 @@ router.post('/', authMiddleware, adminMiddleware, (req, res, next) => {
   const generateTag = (genreName) => { // TODO: move to helpers?
     const tag = (genreName || '')
       .replace('-', '')
+      .replace(`'`, '')
+      .replace(`/`, '')
       .replace(/  +/g, '-')
       .toLowerCase()
     return tag
