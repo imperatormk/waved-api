@@ -30,7 +30,7 @@ router.post('/', authMiddleware, adminMiddleware, (req, res, next) => {
     })
   
     const tag = escapedString
-      .replace(/  +/g, '-')
+      .replace(/ +/g, '-')
       .toLowerCase()
     return tag
   }
