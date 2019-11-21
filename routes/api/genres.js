@@ -22,9 +22,9 @@ router.get('/:tag', (req, res, next) => {
 router.post('/', authMiddleware, adminMiddleware, (req, res, next) => {
   const generateTag = (genreName) => { // TODO: move to helpers?
     const tag = (genreName || '')
-      .replace('-', '')
-      .replace(`'`, '')
-      .replace(`/`, '')
+      .replace('-', ' ')
+      .replace(`'`, ' ')
+      .replace(`/`, ' ')
       .replace(/  +/g, '-')
       .toLowerCase()
     return tag
