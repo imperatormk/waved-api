@@ -1,5 +1,6 @@
 const exportsObj = {}
 
+const fs = require('fs')
 const path = require('path')
 const constants = require('../config/constants')
 
@@ -10,12 +11,17 @@ const mime = require('mime')
 // upload fns
 
 const upload = (subFolder) => {
-  if (!subFolder) throw { status: 'subfolder_missing' }
+  if (!subFolder) throw { msg: 'subfolderMissing' }
 
   const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-      const storagePath = getStoragePath(subFolder)
-      cb(null, storagePath)
+      try {
+        const storagePath = getStoragePath(subFolder)
+        cb(null, storagePath)
+      }
+      catch(err) {
+        cb(err, null)
+      }
     },
     filename: (req, file, cb) => {
       crypto.pseudoRandomBytes(16, (err, raw) => {
@@ -39,7 +45,13 @@ exportsObj.uploadMiddleware = upload
 
 const getStoragePath = (key) => {
   const baseStoragePath = constants.appStoragePath
-  return path.join(baseStoragePath, key)
+  const storagePath = path.join(baseStoragePath, key)
+
+  const exists = fs.existsSync(storagePath)
+  if (!exists)
+    throw { msg: 'invalidPath', details: storagePath }
+
+  return storagePath
 }
 exportsObj.getStoragePath = getStoragePath
 
