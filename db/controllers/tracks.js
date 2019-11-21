@@ -27,7 +27,7 @@ exportsObj.deleteTrack = (trackId) => {
 		where: { id: trackId }
 	}
 	return Track.destroy(options)
-	  .then(() => ({ id: songId }))
+	  .then(() => ({ id: trackId }))
 }
 
 module.exports = exportsObj
