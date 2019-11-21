@@ -31,6 +31,24 @@ const users = (Sequelize) => ({
   }
 })
 
+const genres = (Sequelize) => ({
+  id: {
+    allowNull: false,
+    autoIncrement: true,
+    primaryKey: true,
+    type: Sequelize.INTEGER
+  },
+  name: {
+    type: Sequelize.STRING,
+    allowNull: false
+  },
+  tag: {
+    type: Sequelize.STRING,
+    allowNull: false,
+    unique: true
+  }
+})
+
 const songs = (Sequelize) => ({
   id: {
     allowNull: false,
@@ -61,6 +79,29 @@ const songs = (Sequelize) => ({
   updatedAt: {
     type: Sequelize.DATE,
     defaultValue: Sequelize.NOW // bad
+  }
+})
+
+const genresSongs = (Sequelize) => ({
+  genreId: {
+    type: Sequelize.INTEGER,
+    onDelete: 'CASCADE',
+    references: {
+      model: 'genres',
+      key: 'id',
+      as: 'genreId'
+    },
+    allowNull: false
+  },
+  songId: {
+    type: Sequelize.INTEGER,
+    onDelete: 'CASCADE',
+    references: {
+      model: 'songs',
+      key: 'id',
+      as: 'songId'
+    },
+    allowNull: false
   }
 })
 
@@ -136,6 +177,10 @@ const orders = (Sequelize) => ({
     autoIncrement: true,
     primaryKey: true,
     type: Sequelize.INTEGER
+  },
+  txnId: {
+    type: Sequelize.STRING,
+    allowNull: false
   },
   status: {
     type: Sequelize.STRING,
@@ -214,16 +259,21 @@ module.exports = {
   up: (queryInterface, Sequelize) => {
     return queryInterface.sequelize.transaction((t) => {
       const usersP = queryInterface.createTable('users', users(Sequelize))
+      const genresP = queryInterface.createTable('genres', genres(Sequelize))
       const songsP = queryInterface.createTable('songs', songs(Sequelize))
-      return Promise.all([usersP, songsP])
+      return Promise.all([usersP, genresP, songsP])
         .then(() => {
-          const adminsP = queryInterface.createTable('admins', admins(Sequelize))
-          const tracksP = queryInterface.createTable('tracks', tracks(Sequelize))
-          const ordersP = queryInterface.createTable('orders', orders(Sequelize))
-          return Promise.all([adminsP, tracksP, ordersP])
+          const genresSongsP = queryInterface.createTable('genresSongs', genresSongs(Sequelize))
+          return Promise.all([genresSongsP])
             .then(() => {
-              const processingsP = queryInterface.createTable('processings', processings(Sequelize))
-              return Promise.all([processingsP])
+              const adminsP = queryInterface.createTable('admins', admins(Sequelize))
+              const tracksP = queryInterface.createTable('tracks', tracks(Sequelize))
+              const ordersP = queryInterface.createTable('orders', orders(Sequelize))
+              return Promise.all([adminsP, tracksP, ordersP])
+                .then(() => {
+                  const processingsP = queryInterface.createTable('processings', processings(Sequelize))
+                  return Promise.all([processingsP])
+                })
             })
         })
     })
@@ -238,9 +288,14 @@ module.exports = {
           const ordersP = queryInterface.dropTable('orders')
           return Promise.all([adminsP, tracksP, ordersP])
             .then(() => {
-              const usersP = queryInterface.dropTable('users')
-              const songsP = queryInterface.dropTable('songs')
-              return Promise.all([usersP, songsP])
+              const genresSongsP = queryInterface.dropTable('genresSongs')
+              return Promise.all([genresSongsP])
+              .then(() => {
+                const usersP = queryInterface.dropTable('users')
+                const genresP = queryInterface.dropTable('genres')
+                const songsP = queryInterface.dropTable('songs')
+                  return Promise.all([usersP, genresP, songsP])
+                })
             })
         })
     })

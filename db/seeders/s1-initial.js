@@ -15,7 +15,13 @@ module.exports = {
       createdAt: Sequelize.fn('NOW'), // temp
       updatedAt: Sequelize.fn('NOW') // temp
     }], {})
-    return Promise.all([users])
+
+    const genres = queryInterface.bulkInsert('genres', [{
+      name: 'Rock',
+      tag: 'rock'
+    }])
+
+    return Promise.all([users, genres])
       .then(() => {
         const admins = queryInterface.bulkInsert('admins', [{
           usrId: 2
@@ -28,7 +34,8 @@ module.exports = {
     return Promise.all([admins])
       .then(() => {
         const users = queryInterface.bulkDelete('users', null, {})
-        return Promise.all([users])
+        const genres = queryInterface.bulkDelete('genres', null, {})
+        return Promise.all([users, genres])
       })
   }
 }
