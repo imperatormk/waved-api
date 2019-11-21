@@ -9,7 +9,12 @@ const processingsRoutes = require('./processings')
 const checkEmptyBody = (req, res, next) => {
   const body = req.body
   const bodyMethods = ['POST', 'PUT']
-	if (bodyMethods.includes(req.method) && (!body || Object.keys(body).length === 0)) {
+  
+  const needsBody = bodyMethods.includes(req.method)
+  const hasBody = body
+  const isUpload = !!req.files
+
+	if (needsBody && (!hasBody && !isUpload)) {
     return next({ status: 400, msg: 'emptyBody' })
   }
 	next()
