@@ -153,7 +153,7 @@ const tracks = (Sequelize) => ({
     allowNull: false
   },
   instrument: {
-    type: Sequelize.STRING,
+    type: Sequelize.JSONB, // { type: String, name: String }
     allowNull: false
   },
   url: {

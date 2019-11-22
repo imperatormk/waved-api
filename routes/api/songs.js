@@ -13,7 +13,7 @@ router.get('/', (req, res, next) => {
 
   const criteria = {}
   if (genres) criteria.genres = { tag: genres.split(',') }
-  if (instrument) criteria.instrument = instrument
+  if (instrument) criteria.instrument = { type: instrument }
 
   return db.songs.getSongs({ page, size, by, order }, criteria)
     .then(songs => res.send(songs))

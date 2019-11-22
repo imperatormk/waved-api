@@ -52,7 +52,7 @@ exportsObj.getSongs = (pageData, criteria = {}) => {
 	if (instrument) {
 		delete criteria.instrument
 		trackInclude.where = {
-			instrument
+			instrument // !TODO: rectify this so it can use an object
 		}
   }
 

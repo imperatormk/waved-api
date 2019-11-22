@@ -1,7 +1,7 @@
 'use strict'
 module.exports = (sequelize, DataTypes) => {
   const Track = sequelize.define('track', {
-    instrument: DataTypes.STRING,
+    instrument: DataTypes.JSONB,
     url: DataTypes.STRING,
     status: DataTypes.STRING
   })
