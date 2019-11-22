@@ -3,7 +3,7 @@ const dotenv = require('dotenv')
 dotenv.config()
 
 const fs = require('fs')
-const https = require('http')
+const https = require('https')
 const app = require('./app')
 
 const key = fs.readFileSync('/etc/letsencrypt/live/studiodoblo.de/privkey.pem')
