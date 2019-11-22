@@ -46,11 +46,17 @@ router.get('/:id', (req, res, next) => {
     .catch(err => next(err))
 })
 
-const uploadMw = uploadMiddleware('tracks').fields(
+const uploadMwTracks = uploadMiddleware('tracks').fields(
   [{
     name: 'track', maxCount: 1
   }, {
     name: 'trackData'
+  }]
+)
+
+const uploadMwThumbnails = uploadMiddleware('thumbnails').fields(
+  [{
+    name: 'thumbnail', maxCount: 1
   }]
 )
 
@@ -62,7 +68,7 @@ router.post('/', authMiddleware, adminMiddleware, (req, res, next) => {
     .catch(err => next(err))
 })
 
-router.post('/:id/tracks', uploadMw, (req, res, next) => {
+router.post('/:id/tracks', uploadMwTracks, (req, res, next) => {
   const songId = req.params.id
 
   const url = req.files['track'][0].filename
@@ -89,11 +95,29 @@ router.post('/:id/tracks', uploadMw, (req, res, next) => {
             duration
           })
         })
-        .catch(() => { // TODO: log this
+        .catch((err) => { // TODO: log this
+          console.log('error while inserting track:', err)
           db.tracks.updateTrack({ id, status: 'FAILED' })
         })
 
       return res.status(201).json({ id })
+    })
+    .catch(err => next(err))
+})
+
+router.post('/:id/thumbnail', uploadMwThumbnails, (req, res, next) => {
+  const songId = req.params.id
+  const thumbnailUrl = req.files['thumbnail'][0].filename
+
+  const updateObj = {
+    id: songId,
+    thumbnail: thumbnailUrl
+  }
+  
+  return db.songs.updateSong(updateObj)
+    .then((result) => {
+      const { id, thumbnail } = result
+      return res.status(201).json({ id, thumbnail })
     })
     .catch(err => next(err))
 })
