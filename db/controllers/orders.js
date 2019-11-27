@@ -22,8 +22,7 @@ exportsObj.getOrders = (pageData, criteria = {}) => {
   return Order.findAll(options)
 		.then((orders) => {
 			return Order.count({
-				where: options.where || {},
-        include: options.include || []
+				where: options.where || {}
 			})
 				.then((count) => ({
 					totalElements: count,

@@ -77,8 +77,7 @@ exportsObj.getSongs = (pageData, criteria = {}) => {
 		}))
 		.then((songs) => {
 			return Song.count({
-        where: options.where || {},
-        include: options.include || []
+        where: options.where || {}
       })
 				.then((count) => ({
 					totalElements: count,

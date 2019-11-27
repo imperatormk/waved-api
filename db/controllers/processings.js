@@ -31,8 +31,7 @@ exportsObj.getProcessings = (pageData, userId) => {
   return Processing.findAll(options)
 		.then((processings) => {
 			return Processing.count({
-				where: options.where || {},
-        include: options.include || []
+				where: options.where || {}
 			})
 				.then((count) => ({
 					totalElements: count,
