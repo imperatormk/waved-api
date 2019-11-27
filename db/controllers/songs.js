@@ -169,7 +169,8 @@ exportsObj.updateSong = (song) => {
 	const options = {
 		where: { id: song.id }
 	}
-	return Song.update(song, options)
+  return Song.update(song, options)
+    .then(() => exportsObj.getSongById(song.id))
 }
 
 exportsObj.deleteSong = (songId) => {

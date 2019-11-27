@@ -21,26 +21,36 @@ router.get('/:tag', (req, res, next) => {
     .catch(err => next(err))
 })
 
-router.post('/', authMiddleware, adminMiddleware, (req, res, next) => {
-  const generateTag = (genreName) => { // TODO: move to helpers?
-    const chars = ['-', `'`, '/']
-    let escapedString = genreName
-    chars.forEach((char) => {
-      escapedString = replaceString((escapedString), char, ' ')
-    })
-  
-    const tag = escapedString
-      .replace(/ +/g, '-')
-      .toLowerCase()
-    return tag
-  }
+const generateTag = (genreName) => { // TODO: move to helpers?
+  const chars = ['-', `'`, '/']
+  let escapedString = genreName
+  chars.forEach((char) => {
+    escapedString = replaceString((escapedString), char, ' ')
+  })
 
+  const tag = escapedString
+    .replace(/ +/g, '-')
+    .toLowerCase()
+  return tag
+}
+
+router.post('/', authMiddleware, adminMiddleware, (req, res, next) => {
   const genre = req.body
   const tag = generateTag(genre.name)
   genre.tag = tag
 
   return db.genres.insertGenre(genre)
     .then(result => res.status(201).json(result))
+    .catch(err => next(err))
+})
+
+router.put('/', authMiddleware, adminMiddleware, (req, res, next) => {
+  const genre = req.body
+  const tag = generateTag(genre.name)
+  genre.tag = tag
+
+  return db.genres.updateGenre(genre)
+    .then(result => res.json(result))
     .catch(err => next(err))
 })
 

@@ -142,4 +142,20 @@ router.post('/:id/prepare', authMiddleware, (req, res, next) => {
     .catch(err => next(err))
 })
 
+router.put('/', authMiddleware, adminMiddleware, (req, res, next) => {
+  const song = req.body
+
+  return db.songs.updateSong(song)
+    .then(song => res.json(song))
+    .catch(err => next(err))
+})
+
+router.delete('/:id', authMiddleware, adminMiddleware, (req, res, next) => {
+  const songId = req.params.id
+
+  return db.songs.deleteSong(songId)
+    .then(song => res.json(song))
+    .catch(err => next(err))
+})
+
 module.exports = router

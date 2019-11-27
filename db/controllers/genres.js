@@ -14,8 +14,7 @@ exportsObj.getGenreById = (genreId) => {
 }
 
 exportsObj.insertGenre = (genre) => {
-	return Genre
-		.create(genre)
+	return Genre.create(genre)
 		.then(genre => exportsObj.getGenreById(genre.id))
 }
 
@@ -24,6 +23,7 @@ exportsObj.updateGenre = (genre) => {
 		where: { id: genre.id }
 	}
 	return Genre.update(genre, options)
+		.then(() => exportsObj.getGenreById(genre.id))
 }
 
 exportsObj.deleteGenre = (genreId) => {
