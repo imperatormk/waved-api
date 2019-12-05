@@ -33,7 +33,7 @@ router.get('/:id/order', authMiddleware, (req, res, next) => {
     .catch(err => next(err))
 })
 
-const validateProcessing = (pcsId) => {
+const validateProcessing = ({ pcsId, txnId }) => {
   return db.processings.getProcessingById(pcsId)
     .then((processing) => {
       if (!processing || !processing.order) throw { status: 400, msg: 'badProcessing' }
@@ -44,7 +44,7 @@ const validateProcessing = (pcsId) => {
     })
 }
 
-const validatePayment = (processing) => {
+const validatePayment = ({ ordId, txnId }) => {
   return paymentsService.getPayment(txnId)
     .then(async (payment) => {
       if (!payment) throw { status: 204, msg: 'badTransaction' }
@@ -52,11 +52,11 @@ const validatePayment = (processing) => {
       const { status, isFailed } = payment
       if (!isFailed) {
         await db.orders.updateOrder({
-          id: processing.order.id,
+          id: ordId,
           status
         })
       } else {
-        await db.orders.deleteOrder(processing.order.id)
+        await db.orders.deleteOrder(ordId)
       }
 
       return status
@@ -70,8 +70,8 @@ router.post('/:id/paymentupdate', (req, res, next) => {
 
   if (!pcsId || !txnId) return next({ status: 400, msg: 'emptyBody' })
 
-  validateProcessing(pcsId)
-    .then(processing => validatePayment(processing))
+  validateProcessing({ pcsId, txnId })
+    .then(processing => validatePayment({ ordId: processing.order.id, txnId }))
     .then((status) => {
       if (status === 'paid') {
         processingService.performProcessing(pcsId)
