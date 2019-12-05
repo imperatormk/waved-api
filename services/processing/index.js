@@ -18,6 +18,10 @@ exportsObj.orderProcessing = async (processing) => {
         throw { status: 409, msg: 'alreadyOrdered' }
       } else if (payment.isFailed) {
         // TODO: log this?
+        await db.processings.updateProcessing({
+          id: processing.id,
+          status: 'BROKEN'
+        })
         throw { status: 417, msg: 'brokenOrder' } // this should never occur since failed payments should get cleaned up as soon as they appear
       }
 
