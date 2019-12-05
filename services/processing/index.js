@@ -16,6 +16,9 @@ exportsObj.orderProcessing = async (processing) => {
           performProcessing(processing.id)
         }
         throw { status: 409, msg: 'alreadyOrdered' }
+      } else if (payment.isFailed) {
+        // TODO: log this?
+        throw { status: 417, msg: 'brokenOrder' } // this should never occur since failed payments should get cleaned up as soon as they appear
       }
 
       const paymentUrl = payment.getPaymentUrl()

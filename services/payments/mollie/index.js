@@ -41,10 +41,13 @@ const createPayment = async (processing) => {
   }
 }
 
+const failedStatuses = ['canceled', 'expired', 'failed']
+
 const getPayment = async (txnId) => {
   try {
     const payment = await mollie.payments.get(txnId)
     if (!payment) throw { status: 404, msg: 'paymentNotFound' }
+    payment.isFailed = failedStatuses.includes(payment.status)
     return payment
   } catch (e) {
     return Promise.reject(e)
