@@ -66,7 +66,6 @@ router.post('/:id/perform/', (req, res, next) => {
     .then(({ processing, status }) => {
       if (status === 'paid') {
         processingService.performProcessing(processing.id)
-          .then(() => {}) // TODO: log this?
       }
 
       return res.status(200).send({ status: 'success' })

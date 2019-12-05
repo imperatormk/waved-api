@@ -11,10 +11,10 @@ exportsObj.orderProcessing = async (processing) => {
     if (processing.order) {
       const payment = await paymentsService.getPayment(processing.order.txnId)
       if (payment.isPaid()) {
-        await db.processings.updateProcessing({
-          id: processing.id,
-          status: 'PREPARING'
-        })
+        const currentStatus = processing.status
+        if (currentStatus === 'PENDING') {
+          performProcessing(processing.id)
+        }
         throw { status: 409, msg: 'alreadyOrdered' }
       }
 
@@ -39,7 +39,7 @@ exportsObj.orderProcessing = async (processing) => {
   }
 }
 
-const performProcessing = (id, config) => {
+const performProcessingCore = (id, config) => {
   const { tracks, opts } = config
 
   let ffpipe = ffmpeg()
@@ -89,11 +89,12 @@ const performProcessing = (id, config) => {
   })
 }
 
-exportsObj.performProcessing = (pcsId) => { // this is more of a controller instead of a service
+// TODO: log the outcome of this process
+const performProcessing = (pcsId) => { // this is more of a controller instead of a service
   return db.processings.getProcessingById(pcsId)
     .then((processing) => {
       if (!processing) throw { status: 404, msg: 'processingNotFound' }
-      // if (!processing.orderId) throw { status: 402, msg: 'notYetOrdered' } // this is a wrong check now
+      if (!processing.orderId) throw { status: 402, msg: 'notYetOrdered' }
 
       const forbiddenStatuses = ['PREPARING', 'READY']
       if (forbiddenStatuses.includes(processing.status))
@@ -107,7 +108,7 @@ exportsObj.performProcessing = (pcsId) => { // this is more of a controller inst
       return db.processings.updateProcessing(preparingProcessing)
         .then(() => {
           const config = JSON.parse(processing.config)
-          return performProcessing(pcsId, config)
+          return performProcessingCore(pcsId, config)
             .then((result) => {
               const readyProcessing = { id, status: 'READY', outputFilename: result.filename }
               return db.processings.updateProcessing(readyProcessing)
@@ -121,5 +122,7 @@ exportsObj.performProcessing = (pcsId) => { // this is more of a controller inst
         })
     })
 }
+
+exportsObj.performProcessing = performProcessing
 
 module.exports = exportsObj
