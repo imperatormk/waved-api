@@ -33,14 +33,8 @@ router.get('/:id/order/', authMiddleware, (req, res, next) => {
     .catch(err => next(err))
 })
 
-// this should be webhook endpoint url
-router.post('/:id/perform/', (req, res, next) => {
-  const pcsId = req.params.id
-  const txnId = req.body.id
-
-  if (!pcsId || !txnId) return next({ status: 400, msg: 'emptyBody' })
-
-  db.processings.getProcessingById(pcsId)
+const validateProcessing = (pcsId) => {
+  return db.processings.getProcessingById(pcsId)
     .then((processing) => {
       if (!processing || !processing.order) throw { status: 400, msg: 'badProcessing' }
       if (processing.status !== 'PENDING') throw { status: 400, msg: 'badProcessing' }
@@ -48,27 +42,41 @@ router.post('/:id/perform/', (req, res, next) => {
 
       return processing
     })
-    .then((processing) => {
-      return paymentsService.getPayment(txnId)
-        .then((payment) => {
-          if (!payment) throw { status: 400, msg: 'badTransaction' }
-          const { status } = payment
-          return { processing, status }
+}
+
+const validatePayment = (processing) => {
+  return paymentsService.getPayment(txnId)
+    .then(async (payment) => {
+      if (!payment) throw { status: 204, msg: 'badTransaction' }
+
+      const { status, isFailed } = payment
+      if (!isFailed) {
+        await db.orders.updateOrder({
+          id: processing.order.id,
+          status
         })
-    })
-    .then(({ processing, status }) => {
-      return db.orders.updateOrder({
-        id: processing.order.id,
-        status
-      })
-        .then(() => ({ processing, status }))
-    })
-    .then(({ processing, status }) => {
-      if (status === 'paid') {
-        processingService.performProcessing(processing.id)
+      } else {
+        await db.orders.deleteOrder(processing.order.id)
       }
 
-      return res.status(200).send({ status: 'success' })
+      return status
+    })
+}
+
+// this should be mollie webhook endpoint url; (TODO) move to payments maybe?
+router.post('/:id/paymentupdate/', (req, res, next) => {
+  const pcsId = req.params.id
+  const txnId = req.body.id
+
+  if (!pcsId || !txnId) return next({ status: 400, msg: 'emptyBody' })
+
+  validateProcessing(pcsId)
+    .then(processing => validatePayment(processing))
+    .then((status) => {
+      if (status === 'paid') {
+        processingService.performProcessing(pcsId)
+      }
+      return res.send({ status: 'success' })
     })
     .catch(err => next(err))
 })

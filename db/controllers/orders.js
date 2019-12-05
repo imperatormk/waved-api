@@ -51,4 +51,12 @@ exportsObj.updateOrder = (order) => {
 	return Order.update(order, options)
 }
 
+exportsObj.deleteOrder = (ordId) => {
+	const options = {
+		where: { id: ordId }
+	}
+	return Order.destroy(options)
+	  .then(() => ({ id: ordId }))
+}
+
 module.exports = exportsObj
