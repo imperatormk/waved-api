@@ -10,7 +10,13 @@ exportsObj.orderProcessing = async (processing) => {
   try {
     if (processing.order) {
       const payment = await paymentsService.getPayment(processing.order.txnId)
-      if (payment.isPaid()) throw { status: 409, msg: 'alreadyOrdered' }
+      if (payment.isPaid()) {
+        await db.processings.updateProcessing({
+          id: processing.id,
+          status: 'PREPARING'
+        })
+        throw { status: 409, msg: 'alreadyOrdered' }
+      }
 
       const paymentUrl = payment.getPaymentUrl()
       return { paymentUrl }
