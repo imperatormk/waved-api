@@ -88,23 +88,23 @@ const songs = (Sequelize) => ({
 const genresSongs = (Sequelize) => ({
   genreId: {
     type: Sequelize.INTEGER,
-    onDelete: 'CASCADE',
+    onDelete: 'SET NULL',
     references: {
       model: 'genres',
       key: 'id',
       as: 'genreId'
     },
-    allowNull: false
+    allowNull: true
   },
   songId: {
     type: Sequelize.INTEGER,
-    onDelete: 'CASCADE',
+    onDelete: 'SET NULL',
     references: {
       model: 'songs',
       key: 'id',
       as: 'songId'
     },
-    allowNull: false
+    allowNull: true
   }
 })
 
@@ -240,7 +240,7 @@ const processings = (Sequelize) => ({
   },
   orderId: {
     type: Sequelize.INTEGER,
-    onDelete: 'CASCADE',
+    onDelete: 'SET NULL',
     references: {
       model: 'orders',
       key: 'id',
