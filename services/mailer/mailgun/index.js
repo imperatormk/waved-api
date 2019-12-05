@@ -1,8 +1,8 @@
 const mailgun = require('mailgun-js')
 
 const {
+  DOMAIN, 
   MAILGUN_API_KEY,
-  MAILGUN_DOMAIN, 
   MAILGUN_REGION,
   MAILGUN_NAME,
   MAILGUN_SENDER
@@ -11,7 +11,7 @@ const {
 const euHost = 'api.eu.mailgun.net'
 const config = {
   apiKey: MAILGUN_API_KEY,
-  domain: MAILGUN_DOMAIN,
+  domain: DOMAIN
 }
 if (MAILGUN_REGION === 'EU') config.host = euHost
 const mg = mailgun(config)
