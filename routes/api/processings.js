@@ -17,7 +17,7 @@ router.get('/', authMiddleware, (req, res, next) => {
     .catch(err => next(err))
 })
 
-router.get('/:id/order/', authMiddleware, (req, res, next) => {
+router.get('/:id/order', authMiddleware, (req, res, next) => {
   const pcsId = req.params.id
 
   db.processings.getProcessingById(pcsId)
@@ -64,7 +64,7 @@ const validatePayment = (processing) => {
 }
 
 // this should be mollie webhook endpoint url; (TODO) move to payments maybe?
-router.post('/:id/paymentupdate/', (req, res, next) => {
+router.post('/:id/paymentupdate', (req, res, next) => {
   const pcsId = req.params.id
   const txnId = req.body.id
 
@@ -81,7 +81,7 @@ router.post('/:id/paymentupdate/', (req, res, next) => {
     .catch(err => next(err))
 })
 
-router.get('/:id/download/', authMiddleware, (req, res, next) => {
+router.get('/:id/download', authMiddleware, (req, res, next) => {
   const pcsId = req.params.id
   db.processings.getProcessingById(pcsId)
     .then((result) => {

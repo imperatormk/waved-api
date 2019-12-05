@@ -27,7 +27,7 @@ const createPayment = async (processing) => {
     }
 
     paymentObj.redirectUrl = `http://${ip}:${FPORT}/thankyou`
-    paymentObj.webhookUrl = `http://${ip}:${PORT}/api/processings/${processing.id}/perform`
+    paymentObj.webhookUrl = `http://${ip}:${PORT}/api/processings/${processing.id}/paymentupdate`
 
     const payment = await mollie.payments.create(paymentObj)
     const { id, status } =  payment
