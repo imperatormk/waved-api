@@ -1,7 +1,7 @@
 const db = require(__basedir + '/db/controllers')
 const mollieLib = require('@mollie/api-client')
 
-const { MOLLIE_API_KEY, MODE, PORT, DOMAIN } = process.env
+const { MOLLIE_API_KEY, MODE, PORT, DOMAIN, SUB_DIR } = process.env
 const mollie = mollieLib({ apiKey: MOLLIE_API_KEY })
 
 const currency = 'EUR' // TODO: unhardcode this?
@@ -23,7 +23,8 @@ const createPayment = async (processing) => {
       // TODO: do magic for dev public ip here?
     }
 
-    paymentObj.redirectUrl = `https://${DOMAIN}/thankyou`
+    const subdir = SUB_DIR || ''
+    paymentObj.redirectUrl = `https://${DOMAIN}/${subdir}thankyou`
     paymentObj.webhookUrl = `https://${DOMAIN}:${PORT}/api/processings/${processing.id}/paymentupdate`
 
     const payment = await mollie.payments.create(paymentObj)
