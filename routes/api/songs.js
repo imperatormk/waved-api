@@ -20,11 +20,15 @@ router.get('/', (req, res, next) => {
     .catch(err => next(err))
 })
 
-router.get('/:id', (req, res, next) => {
-  const songId = req.params.id
+router.get('/:field', (req, res, next) => {
+  const fieldVal = req.params.field
+  const idField = req.query.idFld || 'id'
   const pitch = req.query.pitch || 0
 
-  return db.songs.getSongById(songId)
+  const criteriaObj = {}
+  criteriaObj[idField] = fieldVal
+
+  return db.songs.getSong(criteriaObj)
     .then((result) => {
       if (!result) return res.status(404).send({ msg: 'invalidSong' })
       const song = result
