@@ -89,8 +89,9 @@ const forgeSongSlug = (parts) => {
     words.push(part.split(' '))
   })
 
-  const slugUnfiltered = words.join('-')
-  const slug = cleanUpSpecialChars(slugUnfiltered)
+  const slug = words
+    .map(word => cleanUpSpecialChars(word))
+    .join('-')
   return slug.toLowerCase()
 }
 exportsObj.forgeSongSlug = forgeSongSlug
