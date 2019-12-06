@@ -73,16 +73,18 @@ router.post('/:id/paymentupdate', (req, res, next) => {
 
   validateProcessing({ pcsId, txnId })
     .then((processing) => {
+      const { buyer, song } = processing
+
       return validatePayment({ ordId: processing.order.id, txnId })
         .then((status) => {
           if (status === 'paid') {
             processingService.performProcessing(pcsId)
     
-            const { username, email } = processing.buyer
-            const { title, artist } = processing.song
-            const song = { title, artist }
+            const { username, email } = buyer
+            const { title, artist } = song
+            const songObj = { title, artist }
     
-            mailerService.sendOrderConfirmationEmail(email, { username, song })
+            mailerService.sendOrderConfirmationEmail(email, { username, song: songObj })
           }
           return res.send({ status: 'success' })
         })

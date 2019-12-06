@@ -14,11 +14,14 @@ const models = {
 const getPagination = (pageData = {}) => {
   const limit = pageData.size || 100
 	const page = pageData.page || 1
+	const by = pageData.by || 'id'
+	const order = pageData.order || 'ASC'
 	
 	const options = {
     limit,
-    offset: limit * (page - 1)
-  }
+		offset: limit * (page - 1),
+		order: [[by, order]]
+	}
   return options
 }
 
