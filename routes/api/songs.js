@@ -65,9 +65,9 @@ router.post('/', authMiddleware, adminMiddleware, (req, res, next) => {
 
   return db.songs.insertSong(song)
     .then((result) => {
-      const { title, artist } = result
+      const { id, title, artist } = result
       const slug = forgeSongSlug([title, artist])
-      return db.songs.updateSong({ id: song.id, slug })
+      return db.songs.updateSong({ id, slug })
     })
     .then(result => res.status(201).json(result))
     .catch(err => next(err))
