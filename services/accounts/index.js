@@ -56,7 +56,8 @@ exportsObj.register = (user) => {
         .then(hashedPassword => ({ ...user, password: hashedPassword }))
         .then(user => db.users.insertUser(user))
         .then((user) => {
-          mailerService.sendRegisterConfirmationEmail(user)
+          const { username, email } = user
+          mailerService.sendRegisterConfirmationEmail(email, { username })
           return user
         })
     })

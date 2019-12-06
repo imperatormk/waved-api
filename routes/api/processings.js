@@ -77,13 +77,11 @@ router.post('/:id/paymentupdate', (req, res, next) => {
       if (status === 'paid') {
         processingService.performProcessing(pcsId)
 
-        const { username } = processing.buyer
-        const user = { username }
-
+        const { username, email } = processing.buyer
         const { title, artist } = processing.song
         const song = { title, artist }
 
-        mailerService.sendOrderConfirmationEmail({ user, song })
+        mailerService.sendOrderConfirmationEmail(email, { username, song })
       }
       return res.send({ status: 'success' })
     })
