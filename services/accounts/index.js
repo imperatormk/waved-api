@@ -1,8 +1,8 @@
 const exportsObj = {}
 
 const db = require(__basedir + '/db/controllers')
+const mailerService = require(__basedir + '/services/mailer')
 const helper = require('./helper')
-const mailer = require(__basedir + '/services/mailer')
 
 const sanitizeUser = (user) => {
   const passwordFields = ['password', 'confirmPassword']
@@ -56,7 +56,7 @@ exportsObj.register = (user) => {
         .then(hashedPassword => ({ ...user, password: hashedPassword }))
         .then(user => db.users.insertUser(user))
         .then((user) => {
-          mailer.sendConfirmationEmail(user)
+          mailerService.sendRegisterConfirmationEmail(user)
           return user
         })
     })

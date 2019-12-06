@@ -7,6 +7,7 @@ const helpers = require(__basedir + '/helpers')
 const { authMiddleware } = require(__basedir + '/services/auth')
 const processingService = require(__basedir + '/services/processing')
 const paymentsService = require(__basedir + '/services/payments') // TODO: maybe move sometimes
+const mailerService = require(__basedir + '/services/mailer')
 
 router.get('/', authMiddleware, (req, res, next) => {
   const userId = req.user.id
@@ -75,6 +76,14 @@ router.post('/:id/paymentupdate', (req, res, next) => {
     .then((status) => {
       if (status === 'paid') {
         processingService.performProcessing(pcsId)
+
+        const { username } = processing.buyer
+        const user = { username }
+
+        const { title, artist } = processing.song
+        const song = { title, artist }
+
+        mailerService.sendOrderConfirmationEmail({ user, song })
       }
       return res.send({ status: 'success' })
     })
