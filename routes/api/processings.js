@@ -72,18 +72,20 @@ router.post('/:id/paymentupdate', (req, res, next) => {
   if (!pcsId || !txnId) return next({ status: 400, msg: 'emptyBody' })
 
   validateProcessing({ pcsId, txnId })
-    .then(processing => validatePayment({ ordId: processing.order.id, txnId }))
-    .then((status) => {
-      if (status === 'paid') {
-        processingService.performProcessing(pcsId)
-
-        const { username, email } = processing.buyer
-        const { title, artist } = processing.song
-        const song = { title, artist }
-
-        mailerService.sendOrderConfirmationEmail(email, { username, song })
-      }
-      return res.send({ status: 'success' })
+    .then((processing) => {
+      return validatePayment({ ordId: processing.order.id, txnId })
+        .then((status) => {
+          if (status === 'paid') {
+            processingService.performProcessing(pcsId)
+    
+            const { username, email } = processing.buyer
+            const { title, artist } = processing.song
+            const song = { title, artist }
+    
+            mailerService.sendOrderConfirmationEmail(email, { username, song })
+          }
+          return res.send({ status: 'success' })
+        })
     })
     .catch(err => next(err))
 })
