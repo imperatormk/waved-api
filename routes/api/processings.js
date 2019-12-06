@@ -21,7 +21,7 @@ router.get('/', authMiddleware, (req, res, next) => {
 router.get('/:id/order', authMiddleware, (req, res, next) => {
   const pcsId = req.params.id
 
-  db.processings.getProcessingById(pcsId)
+  db.processings.getProcessingById(pcsId, { include: ['order'] })
     .then((processing) => {
       if (!processing) throw { status: 400, msg: 'badProcessing' }
       if (processing.status !== 'PENDING') throw { status: 400, msg: 'badProcessing' }
@@ -35,7 +35,7 @@ router.get('/:id/order', authMiddleware, (req, res, next) => {
 })
 
 const validateProcessing = ({ pcsId, txnId }) => {
-  return db.processings.getProcessingById(pcsId)
+  return db.processings.getProcessingById(pcsId, { include: ['order', 'song', 'buyer'] })
     .then((processing) => {
       if (!processing || !processing.order) throw { status: 400, msg: 'badProcessing' }
       if (processing.status !== 'PENDING') throw { status: 400, msg: 'badProcessing' }

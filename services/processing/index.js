@@ -98,7 +98,7 @@ const performProcessingCore = (id, config) => {
 
 // TODO: log the outcome of this process
 const performProcessing = (pcsId) => { // this is more of a controller instead of a service
-  return db.processings.getProcessingById(pcsId)
+  return db.processings.getProcessingById(pcsId, { include: ['order'] })
     .then((processing) => {
       if (!processing) throw { status: 404, msg: 'processingNotFound' }
       if (!processing.orderId) throw { status: 402, msg: 'notYetOrdered' }

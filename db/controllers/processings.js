@@ -3,6 +3,13 @@ const exportsObj = {}
 const Processing = require('../models').processing
 const Order = require('../models').order
 const Song = require('../models').song
+const User = require('../models').user
+
+const models = {
+	'order': Order,
+	'song': Song,
+	'buyer': User
+}
 
 const getPagination = (pageData = {}) => {
   const limit = pageData.size || 100
@@ -40,13 +47,16 @@ exportsObj.getProcessings = (pageData, userId) => {
 		})
 }
 
-exportsObj.getProcessingById = (pcsId) => {
+exportsObj.getProcessingById = (pcsId, config = { include: [] }) => {
+	const includeArr = config.include
+		.map((model) => ({
+			model: models[model],
+			as: model
+		}))
+
   const options = {
 		where: { id: pcsId },
-    include: [{
-      model: Order,
-      as: 'order'
-    }]
+    include: includeArr
 	}
 	return Processing.findOne(options)
 }
