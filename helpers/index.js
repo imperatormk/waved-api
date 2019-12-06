@@ -75,4 +75,24 @@ const getStaticFilesUrl = (key, filename) => {
 }
 exportsObj.getStaticFilesUrl = getStaticFilesUrl
 
+const forgeSongSlug = (parts) => {
+  const cleanUpSpecialChars = (str) => {
+    return str
+      .replace(/[ÀÁÂÃÄÅàáâãäå]/g, 'a')
+      .replace(/[ÈÉÊË]/g, 'e')
+      .replace(/[Ññ]/g, 'n')
+      .replace(/[^a-z0-9]/gi, '')
+  }
+
+  const words = []
+  parts.forEach((part) => {
+    words.push(part.split(' '))
+  })
+
+  const slugUnfiltered = words.join('-')
+  const slug = cleanUpSpecialChars(slugUnfiltered)
+  return slug.toLowerCase()
+}
+exportsObj.forgeSongSlug = forgeSongSlug
+
 module.exports = exportsObj

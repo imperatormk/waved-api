@@ -71,6 +71,10 @@ const songs = (Sequelize) => ({
     type: Sequelize.FLOAT,
     allowNull: false
   },
+  slug: {
+    type: Sequelize.STRING,
+    allowNull: true
+  },
   duration: {
     type: Sequelize.INTEGER,
     defaultValue: 0

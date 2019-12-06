@@ -2,7 +2,7 @@ const router = require('express').Router()
 
 const db = require(__basedir + '/db/controllers')
 
-const { uploadMiddleware } = require(__basedir + '/helpers')
+const { uploadMiddleware, forgeSongSlug } = require(__basedir + '/helpers')
 const { adminMiddleware, authMiddleware } = require(__basedir + '/services/auth')
 
 const services = require(__basedir + '/services')
@@ -64,6 +64,11 @@ router.post('/', authMiddleware, adminMiddleware, (req, res, next) => {
   const song = req.body
 
   return db.songs.insertSong(song)
+    .then((result) => {
+      const { title, artist } = result
+      const slug = forgeSongSlug([title, artist])
+      return db.songs.updateSong({ id: song.id, slug })
+    })
     .then(result => res.status(201).json(result))
     .catch(err => next(err))
 })
