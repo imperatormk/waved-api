@@ -86,7 +86,7 @@ const forgeSongSlug = (parts) => {
 
   const words = []
   parts.forEach((part) => {
-    words.push(part.split(' '))
+    words.push(...part.split(' '))
   })
 
   const slug = words
