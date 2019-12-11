@@ -15,7 +15,7 @@ router.get('/', (req, res, next) => {
   const criteria = {}
   if (genres) criteria.genres = { tag: genres.split(',') }
   if (instrument) criteria.instrument = { type: instrument }
-  if (unpublished !== true) criteria.unpublished = true
+  if (unpublished !== true) criteria.published = true
 
   return db.songs.getSongs({ page, size, by, order }, criteria)
     .then(songs => res.send(songs))
