@@ -2,6 +2,7 @@ const router = require('express').Router()
 
 const accountsRoutes = require('./accounts')
 const authRoutes = require('./auth')
+const configRoutes = require('./config')
 const genresRoutes = require('./genres')
 const songsRoutes = require('./songs')
 const processingsRoutes = require('./processings')
@@ -35,6 +36,7 @@ router.use(convertToNumbers) // doesn't work atm
 
 router.use('/accounts', accountsRoutes)
 router.use('/auth', authRoutes)
+router.use('/config', configRoutes)
 router.use('/genres', genresRoutes)
 router.use('/songs', songsRoutes)
 router.use('/processings', processingsRoutes)

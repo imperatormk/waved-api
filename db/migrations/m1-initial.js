@@ -266,13 +266,26 @@ const processings = (Sequelize) => ({
   }
 })
 
+const config = (Sequelize) => ({
+  key: {
+    allowNull: false,
+    primaryKey: true,
+    type: Sequelize.STRING
+  },
+  value: {
+    allowNull: false,
+    type: Sequelize.STRING
+  }
+})
+
 module.exports = {
   up: (queryInterface, Sequelize) => {
     return queryInterface.sequelize.transaction((t) => {
+      const configP = queryInterface.createTable('config', config(Sequelize))
       const usersP = queryInterface.createTable('users', users(Sequelize))
       const genresP = queryInterface.createTable('genres', genres(Sequelize))
       const songsP = queryInterface.createTable('songs', songs(Sequelize))
-      return Promise.all([usersP, genresP, songsP])
+      return Promise.all([configP, usersP, genresP, songsP])
         .then(() => {
           const genresSongsP = queryInterface.createTable('genresSongs', genresSongs(Sequelize))
           return Promise.all([genresSongsP])
@@ -302,10 +315,11 @@ module.exports = {
               const genresSongsP = queryInterface.dropTable('genresSongs')
               return Promise.all([genresSongsP])
               .then(() => {
+                const configP = queryInterface.dropTable('config')
                 const usersP = queryInterface.dropTable('users')
                 const genresP = queryInterface.dropTable('genres')
                 const songsP = queryInterface.dropTable('songs')
-                  return Promise.all([usersP, genresP, songsP])
+                  return Promise.all([configP, usersP, genresP, songsP])
                 })
             })
         })

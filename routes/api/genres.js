@@ -1,7 +1,6 @@
 const router = require('express').Router()
 
 const db = require(__basedir + '/db/controllers')
-
 const { adminMiddleware, authMiddleware } = require(__basedir + '/services/auth')
 
 const replaceString = require('replace-string')
