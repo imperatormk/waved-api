@@ -32,7 +32,13 @@ router.get('/:key', (req, res, next) => {
 router.post('/', authMiddleware, adminMiddleware, (req, res, next) => {
   const configObj = req.body
   const verifyParams = new Promise((resolve, reject) => {
-    if (!configObj || !configObj.key || !configObj.value) {
+    const { key, value } = (configObj || {})
+    const isValid = key && value
+
+    const forbiddenKeys = ['LOGO']
+    const isAllowed = !forbiddenKeys.includes(key)
+
+    if (!isValid || !isAllowed) {
       reject({ status: 400, msg: 'badConfig' })
       return
     }
