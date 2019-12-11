@@ -79,6 +79,10 @@ const songs = (Sequelize) => ({
     type: Sequelize.INTEGER,
     defaultValue: 0
   },
+  published: {
+    type: Sequelize.BOOLEAN,
+    defaultValue: false
+  },
   createdAt: {
     type: Sequelize.DATE,
     defaultValue: Sequelize.NOW // bad

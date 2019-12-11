@@ -7,6 +7,7 @@ module.exports = (sequelize, DataTypes) => {
     price: DataTypes.FLOAT,
     slug: DataTypes.STRING,
     duration: DataTypes.INTEGER,
+    published: DataTypes.BOOLEAN,
   })
   Song.associate = function(models) {
     Song.hasMany(models.track, {
