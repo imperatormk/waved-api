@@ -96,4 +96,12 @@ const forgeSongSlug = (parts) => {
 }
 exportsObj.forgeSongSlug = forgeSongSlug
 
+const parseBoolean = (val) => {
+  if (!val) return false
+  const validBooleans = ['false', 'true']
+  if (!validBooleans.includes(val)) return false
+  return JSON.parse(val)
+}
+exportsObj.parseBoolean = parseBoolean
+
 module.exports = exportsObj

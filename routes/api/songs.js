@@ -2,7 +2,7 @@ const router = require('express').Router()
 
 const db = require(__basedir + '/db/controllers')
 
-const { uploadMiddleware, forgeSongSlug } = require(__basedir + '/helpers')
+const { uploadMiddleware, forgeSongSlug, parseBoolean } = require(__basedir + '/helpers')
 const { adminMiddleware, authMiddleware } = require(__basedir + '/services/auth')
 
 const services = require(__basedir + '/services')
@@ -15,7 +15,7 @@ router.get('/', (req, res, next) => {
   const criteria = {}
   if (genres) criteria.genres = { tag: genres.split(',') }
   if (instrument) criteria.instrument = { type: instrument }
-  if (unpublished !== true) criteria.published = true
+  if (parseBoolean(unpublished) !== true) criteria.published = true
 
   return db.songs.getSongs({ page, size, by, order }, criteria)
     .then(songs => res.send(songs))
