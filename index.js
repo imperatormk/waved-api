@@ -3,10 +3,10 @@ const dotenv = require('dotenv')
 dotenv.config()
 
 const fs = require('fs')
-const https = require('http')
+const https = require('https')
 const app = require('./app')
 
-/* const key = fs.readFileSync('/etc/letsencrypt/live/studiodoblo.de/privkey.pem')
+const key = fs.readFileSync('/etc/letsencrypt/live/studiodoblo.de/privkey.pem')
 const cert = fs.readFileSync('/etc/letsencrypt/live/studiodoblo.de/cert.pem')
 const ca = fs.readFileSync('/etc/letsencrypt/live/studiodoblo.de/chain.pem')
 
@@ -16,13 +16,13 @@ const sslOpts = {
   ca: [ca],
   requestCert: false,
   rejectUnauthorized: false
-} */
+}
 
 const port = process.env.PORT || 3000
 app.set('port', port)
 
 require(__basedir + '/db')
 
-const server = https.createServer(app)
+const server = https.createServer(sslOpts, app)
 server.listen(port)
 console.log('Started on port ' + port)
