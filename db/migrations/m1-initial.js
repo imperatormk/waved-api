@@ -79,6 +79,10 @@ const songs = (Sequelize) => ({
     type: Sequelize.INTEGER,
     allowNull: false
   },
+  demoArea: {
+    type: Sequelize.JSONB,
+    defaultValue: null
+  },
   published: {
     type: Sequelize.BOOLEAN,
     defaultValue: false
