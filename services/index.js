@@ -1,7 +1,6 @@
 const ffmpeg = require('fluent-ffmpeg')
 const path = require('path')
 const helpers = require(__basedir + '/helpers')
-const mp3Duration = require('mp3-duration')
 
 const exportsObj = {}
 
@@ -36,14 +35,10 @@ const changeTrackPitch = (filename, pitch) => { // TODO: move this to processing
     ffpipe
       .complexFilter(complexFilter, 'final')
       .on('end', () => {
-        mp3Duration(importPath)
-          .then((duration) => {
-            resolve({
-              status: 'success',
-              path: exportPath,
-              duration: Math.floor(duration)
-            })
-          })
+        resolve({
+          status: 'success',
+          path: exportPath,
+        })
       })
       .on('error', (err) => {
         reject({ status: 500, msg: err.message })

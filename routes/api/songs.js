@@ -94,17 +94,11 @@ router.post('/:id/tracks', uploadMwTracks, (req, res, next) => {
 
   return db.tracks.insertTrack({ ...track, status: 'PREPARING' })
     .then((result) => {
-      const { id, songId } = result
+      const { id } = result
 
       services.pitchifyTrack(url) // TODO: move this from here
-        .then(({ results }) => {
+        .then(() => {
           db.tracks.updateTrack({ id, status: 'READY' })
-
-          const { duration } = results[0] // ym okay
-          db.songs.updateSong({
-            id: songId,
-            duration
-          })
         })
         .catch((err) => { // TODO: log this
           console.log('error while inserting track:', err)

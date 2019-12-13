@@ -77,7 +77,7 @@ const songs = (Sequelize) => ({
   },
   duration: {
     type: Sequelize.INTEGER,
-    defaultValue: 0
+    allowNull: false
   },
   published: {
     type: Sequelize.BOOLEAN,
