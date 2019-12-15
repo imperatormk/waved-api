@@ -124,7 +124,7 @@ router.post('/:id/tracks', uploadMwTracks, (req, res, next) => {
 })
 
 router.delete('/:songId/tracks/:trackId', (req, res, next) => {
-  const { songId, trackId } = req.params.id
+  const { songId, trackId } = req.params
 
   return db.tracks.deleteTrack({ id: trackId, songId })
     .then(() => {
