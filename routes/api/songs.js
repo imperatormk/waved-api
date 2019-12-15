@@ -79,6 +79,19 @@ router.post('/', authMiddleware, adminMiddleware, (req, res, next) => {
     .catch(err => next(err))
 })
 
+router.put('/', authMiddleware, adminMiddleware, (req, res, next) => {
+  const song = req.body || {}
+  const { id, title, artist } = song
+  if (!id || !title || !artist) return next({ status: 400, msg: 'invalidSong' })
+
+  const slug = forgeSongSlug([title, artist])
+  song.slug = slug
+
+  return db.songs.updateSong(song)
+    .then(result => res.json(result))
+    .catch(err => next(err))
+})
+
 router.post('/:id/tracks', uploadMwTracks, (req, res, next) => {
   const songId = req.params.id
 
@@ -106,6 +119,16 @@ router.post('/:id/tracks', uploadMwTracks, (req, res, next) => {
         })
 
       return res.status(201).json({ id })
+    })
+    .catch(err => next(err))
+})
+
+router.delete('/:songId/tracks/:trackId', (req, res, next) => {
+  const { songId, trackId } = req.params.id
+
+  return db.tracks.deleteTrack({ id: trackId, songId })
+    .then(() => {
+      res.json({ songId, trackId })
     })
     .catch(err => next(err))
 })

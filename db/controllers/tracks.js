@@ -22,12 +22,13 @@ exportsObj.updateTrack = (track) => {
 	return Track.update(track, options)
 }
 
-exportsObj.deleteTrack = (trackId) => {
+exportsObj.deleteTrack = (track) => {
+	if (!track || !track.id) return Promise.reject({ msg: 'invalidQuery' })
 	const options = {
-		where: { id: trackId }
+		where: track
 	}
 	return Track.destroy(options)
-	  .then(() => ({ id: trackId }))
+	  .then(() => (track))
 }
 
 module.exports = exportsObj
