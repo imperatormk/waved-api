@@ -51,6 +51,7 @@ exportsObj.updateUser = (user) => {
 	}
 	return addExcludes(options)
 		.then(options => User.update(user, options))
+		.then(() => exportsObj.getUserById(user.id))
 }
 
 exportsObj.deleteUser = (userId) => {
