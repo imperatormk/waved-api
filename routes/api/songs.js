@@ -32,7 +32,7 @@ router.get('/:field', (req, res, next) => {
 
   return db.songs.getSong(criteriaObj)
     .then((result) => {
-      if (!result) return res.status(404).send({ msg: 'invalidSong' })
+      if (!result) return next({ status: 404, msg: 'invalidSong' })
       const song = result
 
       const pitchedTracks = song.tracks.map((track) => {
@@ -126,16 +126,28 @@ router.post('/:id/tracks', uploadMwTracks, (req, res, next) => {
 router.delete('/:songId/tracks/:trackId', (req, res, next) => {
   const { songId, trackId } = req.params
 
-  return db.tracks.deleteTrack({ id: trackId, songId })
-    .then(() => {
-      res.json({ songId, trackId })
+  const criteriaObj = {}
+  criteriaObj[idField] = fieldVal
+
+  return db.songs.getSong(criteriaObj)
+    .then((result) => {
+      if (!result) return next({ status: 404, msg: 'invalidSong' })
+      const { tracks } = result
+      if (tracks.length <= 1) return next({ status: 400, msg: 'cannotRemoveLastTrack' })
+
+      return db.tracks.deleteTrack({ id: trackId, songId })
+        .then(() => {
+          res.json({ songId, trackId })
+        })
+        .catch(err => next(err))
     })
-    .catch(err => next(err))
 })
 
 router.post('/:id/thumbnail', uploadMwThumbnails, (req, res, next) => {
   const songId = req.params.id
-  const thumbnailUrl = req.files['thumbnail'][0].filename
+  const files = req.files['thumbnail']
+  if (!files.length) return next({ status: 400, msg: 'thumbnailMissing' })
+  const thumbnailUrl = files[0].filename
 
   const updateObj = {
     id: songId,
