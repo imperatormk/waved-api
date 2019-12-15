@@ -126,10 +126,7 @@ router.post('/:id/tracks', uploadMwTracks, (req, res, next) => {
 router.delete('/:songId/tracks/:trackId', (req, res, next) => {
   const { songId, trackId } = req.params
 
-  const criteriaObj = {}
-  criteriaObj[idField] = fieldVal
-
-  return db.songs.getSong(criteriaObj)
+  return db.songs.getSong({ id: songId })
     .then((result) => {
       if (!result) return next({ status: 404, msg: 'invalidSong' })
       const { tracks } = result
