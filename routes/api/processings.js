@@ -32,7 +32,10 @@ const validatePayment = ({ ordId, txnId }) => { // service/helper?
           status
         })
       } else {
-        await db.orders.deleteOrder(ordId)
+        // defer this a bit so it can still be read from the post order UI page
+        setTimeout(() => {
+          db.orders.deleteOrder(ordId)
+        }, 30 * 1000)
       }
 
       return status
