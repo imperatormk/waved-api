@@ -9,6 +9,36 @@ const processingService = require(__basedir + '/services/processing')
 const paymentsService = require(__basedir + '/services/payments') // TODO: maybe move sometimes
 const mailerService = require(__basedir + '/services/mailer')
 
+const validateProcessing = ({ pcsId, txnId }) => { // service/helper?
+  return db.processings.getProcessingById(pcsId, { include: ['order', 'song', 'buyer'] })
+    .then((processing) => {
+      if (!processing || !processing.order) throw { status: 400, msg: 'badProcessing' }
+      if (processing.status !== 'PENDING') throw { status: 400, msg: 'badProcessing' }
+      if (processing.order.txnId !== txnId) throw { status: 400, msg: 'badTransaction' }
+
+      return processing
+    })
+}
+
+const validatePayment = ({ ordId, txnId }) => { // service/helper?
+  return paymentsService.getPayment(txnId)
+    .then(async (payment) => {
+      if (!payment) throw { status: 204, msg: 'badTransaction' }
+
+      const { status, isFailed } = payment
+      if (!isFailed) {
+        await db.orders.updateOrder({
+          id: ordId,
+          status
+        })
+      } else {
+        await db.orders.deleteOrder(ordId)
+      }
+
+      return status
+    })
+}
+
 router.get('/', authMiddleware, (req, res, next) => {
   const userId = req.user.id
   const { page, size, by, order } = req.query
@@ -20,13 +50,24 @@ router.get('/', authMiddleware, (req, res, next) => {
 
 router.get('/:id', authMiddleware, (req, res, next) => {
   const pcsId = req.params.id
+  const { order_status } = req.query
 
   db.processings.getProcessingById(pcsId, { include: ['order'] })
     .then((processing) => {
       if (!processing) throw { status: 404, msg: 'notFound' }
+      if (!processing.order) throw { status: 404, msg: 'notFound' }
       if (processing.usrId !== req.user.id) throw { status: 404, msg: 'notFound' }
 
       return processing
+    })
+    .then((processing) => {
+      if (order_status) return processing
+
+      const { id: ordId, txnId } = processing.order
+      return validatePayment({ ordId, txnId })
+        .then((status) => {
+          return { ...processing, order: { status } }
+        })
     })
     .then(result => res.send(result))
     .catch(err => next(err))
@@ -47,36 +88,6 @@ router.get('/:id/order', authMiddleware, (req, res, next) => {
     .then(result => res.send(result))
     .catch(err => next(err))
 })
-
-const validateProcessing = ({ pcsId, txnId }) => {
-  return db.processings.getProcessingById(pcsId, { include: ['order', 'song', 'buyer'] })
-    .then((processing) => {
-      if (!processing || !processing.order) throw { status: 400, msg: 'badProcessing' }
-      if (processing.status !== 'PENDING') throw { status: 400, msg: 'badProcessing' }
-      if (processing.order.txnId !== txnId) throw { status: 400, msg: 'badTransaction' }
-
-      return processing
-    })
-}
-
-const validatePayment = ({ ordId, txnId }) => {
-  return paymentsService.getPayment(txnId)
-    .then(async (payment) => {
-      if (!payment) throw { status: 204, msg: 'badTransaction' }
-
-      const { status, isFailed } = payment
-      if (!isFailed) {
-        await db.orders.updateOrder({
-          id: ordId,
-          status
-        })
-      } else {
-        await db.orders.deleteOrder(ordId)
-      }
-
-      return status
-    })
-}
 
 // this should be mollie webhook endpoint url; (TODO) move to payments maybe?
 router.post('/:id/paymentupdate', (req, res, next) => {
