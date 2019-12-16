@@ -18,6 +18,20 @@ router.get('/', authMiddleware, (req, res, next) => {
     .catch(err => next(err))
 })
 
+router.get('/:id', authMiddleware, (req, res, next) => {
+  const pcsId = req.params.id
+
+  db.processings.getProcessingById(pcsId, { include: ['order'] })
+    .then((processing) => {
+      if (!processing) throw { status: 404, msg: 'notFound' }
+      if (processing.usrId !== req.user.id) throw { status: 404, msg: 'notFound' }
+
+      return processing
+    })
+    .then(result => res.send(result))
+    .catch(err => next(err))
+})
+
 router.get('/:id/order', authMiddleware, (req, res, next) => {
   const pcsId = req.params.id
 

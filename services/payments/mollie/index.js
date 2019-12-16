@@ -24,7 +24,7 @@ const createPayment = async (processing) => {
     }
 
     const subdir = SUB_DIR || ''
-    paymentObj.redirectUrl = `https://${DOMAIN}${subdir}/postorder`
+    paymentObj.redirectUrl = `https://${DOMAIN}${subdir}/postorder?id=${processing.id}`
     paymentObj.webhookUrl = `https://${DOMAIN}:${PORT}/api/processings/${processing.id}/paymentupdate`
 
     const payment = await mollie.payments.create(paymentObj)
