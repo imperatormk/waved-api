@@ -61,7 +61,7 @@ router.get('/:id', authMiddleware, (req, res, next) => {
       return processing
     })
     .then((processing) => {
-      if (order_status) return processing
+      if (!order_status) return processing
 
       const { id: ordId, txnId } = processing.order
       return validatePayment({ ordId, txnId })
