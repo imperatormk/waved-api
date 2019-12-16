@@ -58,7 +58,7 @@ router.get('/:id', authMiddleware, (req, res, next) => {
       if (!processing.order) throw { status: 404, msg: 'notFound' }
       if (processing.usrId !== req.user.id) throw { status: 404, msg: 'notFound' }
 
-      return processing
+      return processing.toJSON()
     })
     .then((processing) => {
       if (!order_status) return processing
