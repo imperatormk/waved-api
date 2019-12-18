@@ -85,14 +85,21 @@ router.put('/:id', authMiddleware, adminMiddleware, (req, res, next) => {
   const song = req.body || {}
   const { id } = req.params
   const { title, artist } = song
-  if (!id || !title || !artist) return next({ status: 400, msg: 'invalidSong' })
 
-  const slug = forgeSongSlug([title, artist])
-  song.slug = slug
+  return db.songs.getSongById(id)
+    .then((song) => {
+      if (!song) throw { status: 400, msg: 'invalidSong' }
 
-  return db.songs.updateSong(song)
-    .then(result => res.json(result))
+      if (title && artist) {
+        const slug = forgeSongSlug([title, artist])
+        song.slug = slug
+      }
+    
+      return db.songs.updateSong(song)
+        .then(result => res.json(result))
+    })
     .catch(err => next(err))
+
 })
 
 router.put('/:id/tracks', uploadMwTracks, (req, res, next) => {
