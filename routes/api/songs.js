@@ -79,9 +79,10 @@ router.post('/', authMiddleware, adminMiddleware, (req, res, next) => {
     .catch(err => next(err))
 })
 
-router.put('/', authMiddleware, adminMiddleware, (req, res, next) => {
+router.put('/:id', authMiddleware, adminMiddleware, (req, res, next) => {
   const song = req.body || {}
-  const { id, title, artist } = song
+  const { id } = req.params
+  const { title, artist } = song
   if (!id || !title || !artist) return next({ status: 400, msg: 'invalidSong' })
 
   const slug = forgeSongSlug([title, artist])
@@ -92,7 +93,7 @@ router.put('/', authMiddleware, adminMiddleware, (req, res, next) => {
     .catch(err => next(err))
 })
 
-router.post('/:id/tracks', uploadMwTracks, (req, res, next) => {
+router.put('/:id/tracks', uploadMwTracks, (req, res, next) => {
   const songId = req.params.id
 
   const url = req.files['track'][0].filename
@@ -123,24 +124,7 @@ router.post('/:id/tracks', uploadMwTracks, (req, res, next) => {
     .catch(err => next(err))
 })
 
-router.delete('/:songId/tracks/:trackId', (req, res, next) => {
-  const { songId, trackId } = req.params
-
-  return db.songs.getSong({ id: songId })
-    .then((result) => {
-      if (!result) return next({ status: 404, msg: 'invalidSong' })
-      const { tracks } = result
-      if (tracks.length <= 1) return next({ status: 400, msg: 'cannotRemoveLastTrack' })
-
-      return db.tracks.deleteTrack({ id: trackId, songId })
-        .then(() => {
-          res.json({ songId, trackId })
-        })
-        .catch(err => next(err))
-    })
-})
-
-router.post('/:id/thumbnail', uploadMwThumbnails, (req, res, next) => {
+router.put('/:id/thumbnail', uploadMwThumbnails, (req, res, next) => {
   const songId = req.params.id
   const files = req.files['thumbnail']
   if (!files.length) return next({ status: 400, msg: 'thumbnailMissing' })
@@ -159,7 +143,7 @@ router.post('/:id/thumbnail', uploadMwThumbnails, (req, res, next) => {
     .catch(err => next(err))
 })
 
-router.post('/:id/prepare', authMiddleware, (req, res, next) => {
+router.put('/:id/prepare', authMiddleware, (req, res, next) => {
   const userId = req.user.id
   const songId = req.params.id
   const config = req.body
@@ -179,25 +163,29 @@ router.post('/:id/prepare', authMiddleware, (req, res, next) => {
     .catch(err => next(err))
 })
 
-router.put('/', authMiddleware, adminMiddleware, (req, res, next) => {
-  const song = req.body
-
-  return db.songs.updateSong(song)
-    .then((result) => {
-      const { id, title, artist } = result
-      const slug = forgeSongSlug([title, artist])
-      return db.songs.updateSong({ id, slug })
-    })
-    .then(song => res.json(song))
-    .catch(err => next(err))
-})
-
 router.delete('/:id', authMiddleware, adminMiddleware, (req, res, next) => {
   const songId = req.params.id
 
   return db.songs.deleteSong(songId)
     .then(song => res.json(song))
     .catch(err => next(err))
+})
+
+router.delete('/:songId/tracks/:trackId', (req, res, next) => {
+  const { songId, trackId } = req.params
+
+  return db.songs.getSong({ id: songId })
+    .then((result) => {
+      if (!result) return next({ status: 404, msg: 'invalidSong' })
+      const { tracks } = result
+      if (tracks.length <= 1) return next({ status: 400, msg: 'cannotRemoveLastTrack' })
+
+      return db.tracks.deleteTrack({ id: trackId, songId })
+        .then(() => {
+          res.json({ songId, trackId })
+        })
+        .catch(err => next(err))
+    })
 })
 
 module.exports = router

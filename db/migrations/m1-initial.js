@@ -87,6 +87,10 @@ const songs = (Sequelize) => ({
     type: Sequelize.BOOLEAN,
     defaultValue: false
   },
+  archived: {
+    type: Sequelize.BOOLEAN,
+    defaultValue: false
+  },
   createdAt: {
     type: Sequelize.DATE,
     defaultValue: Sequelize.NOW // bad

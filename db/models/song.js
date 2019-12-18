@@ -9,6 +9,7 @@ module.exports = (sequelize, DataTypes) => {
     duration: DataTypes.INTEGER,
     demoArea: DataTypes.JSONB,
     published: DataTypes.BOOLEAN,
+    archived: DataTypes.BOOLEAN
   })
   Song.associate = function(models) {
     Song.hasMany(models.track, {

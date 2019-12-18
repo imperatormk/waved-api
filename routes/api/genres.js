@@ -43,8 +43,10 @@ router.post('/', authMiddleware, adminMiddleware, (req, res, next) => {
     .catch(err => next(err))
 })
 
-router.put('/', authMiddleware, adminMiddleware, (req, res, next) => {
+router.put('/:id', authMiddleware, adminMiddleware, (req, res, next) => {
+  const { id } = req.params
   const genre = req.body
+  genre.id = id
   const tag = generateTag(genre.name)
   genre.tag = tag
 
