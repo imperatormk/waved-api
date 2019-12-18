@@ -16,7 +16,7 @@ router.get('/', (req, res, next) => {
   if (genres) criteria.genres = { tag: genres.split(',') }
   if (instrument) criteria.instrument = { type: instrument }
   if (parseBoolean(unpublished) !== true) criteria.published = true
-  if (feed) criteriaObj.feed = feed
+  if (feed) criteria.feed = feed
 
   return db.songs.getSongs({ page, size, by, order }, criteria)
     .then(songs => res.send(songs))
@@ -30,7 +30,6 @@ router.get('/:field', (req, res, next) => {
 
   const criteriaObj = {}
   criteriaObj[idField] = fieldVal
-  if (feed) criteriaObj.feed = feed
 
   return db.songs.getSong(criteriaObj)
     .then((result) => {
