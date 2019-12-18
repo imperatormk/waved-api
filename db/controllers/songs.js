@@ -76,11 +76,13 @@ exportsObj.getSongs = (pageData, criteria = {}) => {
 			return song
 		}))
 		.then((songs) => {
-			return Song.count({
-        where: options.where || {}
+			return Song.findAll({
+        where: options.where || {},
+        include: options.include || [],
+        attributes: ['id']
       })
-				.then((count) => ({
-					totalElements: count,
+				.then((countArr) => ({
+					totalElements: countArr.length,
 					content: songs
 				}))
 		})
