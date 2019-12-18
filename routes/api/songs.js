@@ -10,12 +10,13 @@ const services = require(__basedir + '/services')
 router.get('/', (req, res, next) => {
   const { page, size, by, order } = req.query
   const { genres, instrument } = req.query
-  const { unpublished } = req.query
+  const { unpublished, feed } = req.query
 
   const criteria = {}
   if (genres) criteria.genres = { tag: genres.split(',') }
   if (instrument) criteria.instrument = { type: instrument }
   if (parseBoolean(unpublished) !== true) criteria.published = true
+  if (feed) criteriaObj.feed = feed
 
   return db.songs.getSongs({ page, size, by, order }, criteria)
     .then(songs => res.send(songs))
@@ -29,6 +30,7 @@ router.get('/:field', (req, res, next) => {
 
   const criteriaObj = {}
   criteriaObj[idField] = fieldVal
+  if (feed) criteriaObj.feed = feed
 
   return db.songs.getSong(criteriaObj)
     .then((result) => {
