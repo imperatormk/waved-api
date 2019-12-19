@@ -45,13 +45,20 @@ router.post('/', authMiddleware, adminMiddleware, (req, res, next) => {
 
 router.put('/:id', authMiddleware, adminMiddleware, (req, res, next) => {
   const { id } = req.params
-  const genre = req.body
-  genre.id = id
-  const tag = generateTag(genre.name)
-  genre.tag = tag
 
-  return db.genres.updateGenre(genre)
-    .then(result => res.json(result))
+  return db.songs.getGenreById(id)
+    .then((res) => {
+      if (!res) throw { status: 400, msg: 'invalidGenre' }
+
+      const genre = req.body
+      genre.id = id
+
+      const tag = generateTag(genre.name)
+      genre.tag = tag
+
+      return db.genres.updateGenre(genre)
+        .then(result => res.json(result))
+    })
     .catch(err => next(err))
 })
 
