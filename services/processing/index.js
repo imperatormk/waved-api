@@ -46,7 +46,7 @@ exportsObj.orderProcessing = async (processing) => {
   }
 }
 
-const performProcessingCore = (id, config) => {
+const performProcessingCore = (id, config, song) => {
   const { tracks, opts } = config
 
   let ffpipe = ffmpeg()
@@ -80,7 +80,7 @@ const performProcessingCore = (id, config) => {
   // tempo
   complexFilter.push(`[merged]atempo=${opts.tempo}[final]`)
   
-  const exportFilename = `processed_${id}.${ext}`
+  const exportFilename = `${song.slug}-${id}.${ext}`
   const exportPath = path.join(directory, 'output', exportFilename)
 
   return new Promise((resolve, reject) => {
@@ -98,7 +98,7 @@ const performProcessingCore = (id, config) => {
 
 // TODO: log the outcome of this process
 const performProcessing = (pcsId) => { // this is more of a controller instead of a service
-  return db.processings.getProcessingById(pcsId, { include: ['order'] })
+  return db.processings.getProcessingById(pcsId, { include: ['order', 'song'] })
     .then((processing) => {
       if (!processing) throw { status: 404, msg: 'processingNotFound' }
       if (!processing.orderId) throw { status: 402, msg: 'notYetOrdered' }
@@ -109,13 +109,13 @@ const performProcessing = (pcsId) => { // this is more of a controller instead o
       return processing.toJSON()
     })
     .then((processing) => {
-      const { id } = processing
+      const { id, song } = processing
       const preparingProcessing = { id, status: 'PREPARING' }
 
       return db.processings.updateProcessing(preparingProcessing)
         .then(() => {
           const config = JSON.parse(processing.config)
-          return performProcessingCore(pcsId, config)
+          return performProcessingCore(pcsId, config, { slug: song.slug })
             .then((result) => {
               const readyProcessing = { id, status: 'READY', outputFilename: result.filename }
               return db.processings.updateProcessing(readyProcessing)
