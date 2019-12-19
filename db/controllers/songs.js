@@ -54,7 +54,7 @@ const getBestSellers = (count) => {
     })
 }
 
-exportsObj.getSongs = (pageData, criteria = {}) => {
+exportsObj.getSongs = async (pageData, criteria = {}) => {
 	// flimsy
 	const trackInclude = {
 		model: Track,
@@ -77,17 +77,16 @@ exportsObj.getSongs = (pageData, criteria = {}) => {
     criteria.archived = false
   }
 
+  const bestsellers = []
   if (feed === 'latest') {
     pageData.by = 'id'
     pageData.order = 'DESC'
   } else if (feed === 'archive') {
     criteria.archived = true
   } else if (feed === 'bestsellers') {
-    // !TODO: implement
-    getBestSellers(pagination.limit)
-      .then((bestIds) => {
-        console.log(bestIds)
-      })
+    const _bestsellers = await getBestSellers(pagination.limit)
+    criteria.id = _bestsellers
+    bestsellers.push(..._bestsellers)
   }
   delete criteria.feed
 
@@ -116,6 +115,16 @@ exportsObj.getSongs = (pageData, criteria = {}) => {
 			return song
 		}))
 		.then((songs) => {
+      const _songs = []
+      if (bestsellers.length) {
+        bestsellers.forEach((bestId) => {
+          const _song = songs.find(item => item.id === bestId)
+          _songs.push(_song)
+        })
+      } else {
+        _songs.push(...songs)
+      }
+
 			return Song.findAll({
         where: options.where || {},
         include: options.include || [],
@@ -123,7 +132,7 @@ exportsObj.getSongs = (pageData, criteria = {}) => {
       })
 				.then((countArr) => ({
 					totalElements: countArr.length,
-					content: songs
+					content: _songs
 				}))
 		})
 }
