@@ -47,9 +47,16 @@ exportsObj.getSongs = (pageData, criteria = {}) => {
     through: { attributes: [] }
   }
 
-  const { instrument, genres, feed } = criteria
+  const { instrument, genres, feed, archived } = criteria
 
-  criteria.archived = false
+  if (archived) {
+    if (archived === 'all') {
+      delete criteria.archived
+    }
+  } else {
+    criteria.archived = false
+  }
+
   if (feed === 'latest') {
     pageData.by = 'id'
     pageData.order = 'DESC'
