@@ -44,8 +44,8 @@ const getBestSellers = (count) => {
     where: {
       status: 'READY'
     },
-    attributes: ['songId', [sequelize.fn('COUNT', 'songId'), 'pcsCount']],
-    order: [[sequelize.literal('pcsCount'), 'DESC'], ['songId', 'DESC']],
+    attributes: ['songId', [sequelize.fn('COUNT', 'songId'), 'pcscount']],
+    order: [[sequelize.literal('pcscount'), 'DESC'], ['songId', 'DESC']],
     limit: count
   })
     .then((results) => {
