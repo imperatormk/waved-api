@@ -4,6 +4,7 @@ const Song = require('../models').song
 const Genre = require('../models').genre
 const Track = require('../models').track
 const GenresSongs = require('../models').genresSongs
+const Processing = require('../models').processing
 const sequelize = require('../models').sequelize
 
 const getPagination = (pageData = {}) => {
@@ -35,6 +36,24 @@ const appendSongStatus = (songObj) => {
 	}
 }
 
+const getBestSellers = (count) => {
+  if (!count) throw { status: 'badParams' }
+
+  return Processing.findAll({
+    group: ['songId'],
+    where: {
+      status: 'READY'
+    },
+    attributes: ['songId', [sequelize.fn('COUNT', 'songId'), 'pcsCount']],
+    order: [['pcsCount', 'DESC']],
+    limit: count
+  })
+    .then((results) => {
+      const songIds = results.map(item => item.songId)
+      return songIds
+    })
+}
+
 exportsObj.getSongs = (pageData, criteria = {}) => {
 	// flimsy
 	const trackInclude = {
@@ -48,6 +67,7 @@ exportsObj.getSongs = (pageData, criteria = {}) => {
   }
 
   const { instrument, genres, feed, archived } = criteria
+  const pagination = getPagination(pageData)
 
   if (archived) {
     if (archived === 'all') {
@@ -64,14 +84,16 @@ exportsObj.getSongs = (pageData, criteria = {}) => {
     criteria.archived = true
   } else if (feed === 'bestsellers') {
     // !TODO: implement
+    getBestSellers(pagination.limit)
+      .then((bestIds) => {
+        console.log(bestIds)
+      })
   }
   delete criteria.feed
 
 	if (instrument) {
 		delete criteria.instrument
-		trackInclude.where = {
-			instrument // !TODO: rectify this so it can use an object
-		}
+		trackInclude.where = { instrument } // works a bit magically tbh
   }
 
   if (genres) {
@@ -85,7 +107,7 @@ exportsObj.getSongs = (pageData, criteria = {}) => {
       trackInclude,
       genreInclude
     ],
-		...getPagination(pageData),
+		...pagination,
   }
 	return Song.findAll(options)
 		.then(songs => songs.map(appendSongStatus))
