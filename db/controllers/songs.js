@@ -119,7 +119,7 @@ exportsObj.getSongs = async (pageData, criteria = {}) => {
       if (bestsellers.length) {
         bestsellers.forEach((bestId) => {
           const _song = songs.find(item => item.id === bestId)
-          _songs.push(_song)
+          if (_song) _songs.push(_song)
         })
       } else {
         _songs.push(...songs)
