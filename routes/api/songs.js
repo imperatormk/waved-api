@@ -86,8 +86,8 @@ router.put('/:id', authMiddleware, adminMiddleware, (req, res, next) => {
   const { title, artist } = song
 
   return db.songs.getSongById(id)
-    .then((res) => {
-      if (!res) throw { status: 400, msg: 'invalidSong' }
+    .then((result) => {
+      if (!result) throw { status: 400, msg: 'invalidSong' }
 
       song.id = id
       if (title && artist) {

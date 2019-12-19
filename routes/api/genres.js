@@ -47,8 +47,8 @@ router.put('/:id', authMiddleware, adminMiddleware, (req, res, next) => {
   const { id } = req.params
 
   return db.songs.getGenreById(id)
-    .then((res) => {
-      if (!res) throw { status: 400, msg: 'invalidGenre' }
+    .then((result) => {
+      if (!result) throw { status: 400, msg: 'invalidGenre' }
 
       const genre = req.body
       genre.id = id
