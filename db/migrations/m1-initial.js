@@ -75,6 +75,10 @@ const songs = (Sequelize) => ({
     type: Sequelize.STRING,
     allowNull: true
   },
+  bpm: {
+    type: Sequelize.INTEGER,
+    allowNull: false
+  },
   duration: {
     type: Sequelize.INTEGER,
     allowNull: false

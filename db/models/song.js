@@ -6,6 +6,7 @@ module.exports = (sequelize, DataTypes) => {
     thumbnail: DataTypes.STRING,
     price: DataTypes.FLOAT,
     slug: DataTypes.STRING,
+    bpm: DataTypes.INTEGER,
     duration: DataTypes.INTEGER,
     demoArea: DataTypes.JSONB,
     published: DataTypes.BOOLEAN,
