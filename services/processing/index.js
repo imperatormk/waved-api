@@ -78,7 +78,7 @@ const performProcessingCore = (id, config, song) => {
   // merge
   complexFilter.push(`${allTracks}amix=inputs=${tracks.length}[merged]`)
   // tempo
-  complexFilter.push(`[merged]atempo=${opts.tempo}[final]`)
+  complexFilter.push(`[merged]atempo=${opts.tempo.percentage}[final]`)
   
   const exportFilename = `${song.slug}-${id}.${ext}`
   const exportPath = path.join(directory, 'output', exportFilename)
