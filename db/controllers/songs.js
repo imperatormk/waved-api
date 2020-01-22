@@ -1,11 +1,13 @@
 const exportsObj = {}
 
+const sequelize = require('../models').sequelize
+const Op = require('sequelize').Op
+
 const Song = require('../models').song
 const Genre = require('../models').genre
 const Track = require('../models').track
 const GenresSongs = require('../models').genresSongs
 const Processing = require('../models').processing
-const sequelize = require('../models').sequelize
 
 const getPagination = (pageData = {}) => {
   const limit = pageData.size || 100
@@ -66,7 +68,7 @@ exportsObj.getSongs = async (pageData, criteria = {}) => {
     through: { attributes: [] }
   }
 
-  const { instrument, genres, feed, archived } = criteria
+  const { instrument, genres, feed, archived, searchTerm } = criteria
   const pagination = getPagination(pageData)
 
   if (archived) {
@@ -98,6 +100,16 @@ exportsObj.getSongs = async (pageData, criteria = {}) => {
   if (genres) {
 		delete criteria.genres
 		genreInclude.where = genres
+  }
+  if (searchTerm) {
+    delete criteria.searchTerm
+    criteria = {
+      [Op.or]: [{
+        title: { [Op.like]: `%${searchTerm}%` }
+      }, {
+        artist: { [Op.like]: `%${searchTerm}%` }
+      }]
+    }
   }
   
   const options = {

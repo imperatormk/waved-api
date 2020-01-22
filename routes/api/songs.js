@@ -9,12 +9,13 @@ const services = require(__basedir + '/services')
 
 router.get('/', (req, res, next) => {
   const { page, size, by, order } = req.query
-  const { genres, instrument } = req.query
+  const { genres, instrument, q } = req.query
   const { unpublished, feed, archived } = req.query
 
   const criteria = {}
   if (genres) criteria.genres = { tag: genres.split(',') }
   if (instrument) criteria.instrument = { type: instrument }
+  if (q) criteria.searchTerm = q
   if (parseBoolean(unpublished) !== true) criteria.published = true
 
   if (feed) criteria.feed = feed
