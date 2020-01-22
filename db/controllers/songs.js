@@ -105,9 +105,9 @@ exportsObj.getSongs = async (pageData, criteria = {}) => {
     delete criteria.searchTerm
     criteria = {
       [Op.or]: [{
-        title: { [Op.like]: `%${searchTerm}%` }
+        title: { [Op.iLike]: `%${searchTerm}%` }
       }, {
-        artist: { [Op.like]: `%${searchTerm}%` }
+        artist: { [Op.iLike]: `%${searchTerm}%` }
       }]
     }
   }
